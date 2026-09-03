@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How to choose and build the right power supply for any project. For B.Tech students and makers. Free online edition.">
+<meta name="author" content="Yogesh Bawane">
+<meta name="theme-color" content="#EFF2EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1512" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://REPLACE-WITH-YOUR-DOMAIN/book/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFF2EE'/%3E%3Cpath d='M2 11h8l2 13h2c3 0 4-13 6-13h10' stroke='%23A9531A' stroke-width='3' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Power First">
+<meta property="og:title" content="Power First — a practical power supply book">
+<meta property="og:description" content="How to choose and build the right power supply for any project. For B.Tech students and makers. Free online edition.">
+<meta property="og:url" content="https://REPLACE-WITH-YOUR-DOMAIN/book/">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Power First — a practical power supply book">
+<meta name="twitter:description" content="How to choose and build the right power supply for any project. For B.Tech students and makers. Free online edition.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN/og.png">
+<title>Power First</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#EFF2EE; --surface:#FBFCFA; --surface-2:#E4EAE3;
+  --ink:#141C18; --ink-soft:#4A554E; --ink-faint:#77837B;
+  --rule:#CED6CC; --rule-soft:#DDE3DB;
+  --copper:#A9531A; --copper-deep:#7E3D12; --copper-wash:#F3E4D8;
+  --trace:#0C6866; --trace-wash:#DCEAE8;
+  --warn:#932517; --warn-wash:#F4E0DC;
+  --sidebar:280px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1512; --surface:#161D19; --surface-2:#1E2721;
+  --ink:#E7ECE5; --ink-soft:#9DAAA1; --ink-faint:#7A867E;
+  --rule:#2B3830; --rule-soft:#232E28;
+  --copper:#E0904D; --copper-deep:#C4762F; --copper-wash:#2C2018;
+  --trace:#45B7B2; --trace-wash:#122725;
+  --warn:#E58067; --warn-wash:#2E1A16;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1512; --surface:#161D19; --surface-2:#1E2721;
+  --ink:#E7ECE5; --ink-soft:#9DAAA1; --ink-faint:#7A867E;
+  --rule:#2B3830; --rule-soft:#232E28;
+  --copper:#E0904D; --copper-deep:#C4762F; --copper-wash:#2C2018;
+  --trace:#45B7B2; --trace-wash:#122725;
+  --warn:#E58067; --warn-wash:#2E1A16;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif; font-size:17px; line-height:1.65;
+  margin:0; -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- topbar ---------- */
+.top{
+  position:sticky; top:0; z-index:40; background:var(--bg);
+  border-bottom:1px solid var(--rule); display:flex; align-items:center;
+  gap:14px; padding:10px 20px;
+}
+.brand{
+  font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:16px;
+  letter-spacing:-.02em; color:var(--ink); background:none; border:0; padding:0;
+  cursor:pointer; display:flex; align-items:baseline; gap:9px;
+}
+.brand span{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600;
+  letter-spacing:.16em; color:var(--copper); text-transform:uppercase}
+.top .prog{
+  margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:11px;
+  color:var(--ink-faint); letter-spacing:.04em;
+}
+.menu-btn{
+  display:none; background:var(--surface); border:1px solid var(--rule);
+  color:var(--ink); font-family:"IBM Plex Mono",monospace; font-size:11px;
+  font-weight:600; letter-spacing:.1em; padding:6px 11px; cursor:pointer; border-radius:2px;
+}
+
+/* ---------- shell ---------- */
+.shell{display:grid; grid-template-columns:var(--sidebar) 1fr; align-items:start}
+
+/* ---------- sidebar ---------- */
+.side{
+  position:sticky; top:49px; height:calc(100vh - 49px); overflow-y:auto;
+  border-right:1px solid var(--rule); padding:20px 16px 60px; background:var(--bg);
+}
+.filter{
+  width:100%; font-family:"IBM Plex Mono",monospace; font-size:12px;
+  padding:7px 10px; background:var(--surface); color:var(--ink);
+  border:1px solid var(--rule); border-radius:2px; margin:0 0 16px;
+}
+.filter::placeholder{color:var(--ink-faint)}
+.filter:focus{outline:2px solid var(--copper); outline-offset:1px}
+.side-part{
+  font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--ink-faint);
+  margin:18px 0 6px; padding:0 8px;
+}
+.side-part:first-of-type{margin-top:0}
+.side-link{
+  display:grid; grid-template-columns:8px 26px 1fr; gap:8px; align-items:baseline;
+  width:100%; text-align:left; background:none; border:0; cursor:pointer;
+  font-family:"Archivo",system-ui,sans-serif; font-size:13.5px; line-height:1.35;
+  color:var(--ink-soft); padding:6px 8px; border-radius:2px;
+}
+.side-link:hover{background:var(--surface-2); color:var(--ink)}
+.side-link:focus-visible{outline:2px solid var(--copper); outline-offset:-2px}
+.side-link.on{background:var(--copper-wash); color:var(--copper-deep); font-weight:600}
+.side-link .dot{width:6px; height:6px; border-radius:50%; background:var(--rule); align-self:center}
+.side-link.live .dot{background:var(--trace)}
+.side-link .num{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-faint)}
+.side-link.on .num{color:var(--copper)}
+
+/* ---------- main ---------- */
+main{padding:0 34px 100px; min-width:0}
+.reader{max-width:70ch; margin:0 auto}
+
+/* ---------- home ---------- */
+.hero{padding:48px 0 8px}
+.kicker{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--copper); margin:0 0 16px;
+}
+h1{
+  font-family:"Archivo",system-ui,sans-serif; font-weight:700;
+  font-size:clamp(2.6rem,7vw,4.4rem); line-height:.96; letter-spacing:-.028em;
+  margin:0 0 6px; text-wrap:balance;
+}
+.tagline{
+  font-family:"Archivo",system-ui,sans-serif; font-weight:500;
+  font-size:clamp(1.1rem,2.6vw,1.45rem); line-height:1.22; letter-spacing:-.014em;
+  color:var(--copper); margin:0 0 24px; max-width:26ch;
+}
+.standfirst{font-size:1.12rem; color:var(--ink-soft); max-width:56ch; margin:0 0 30px}
+.cta-row{display:flex; flex-wrap:wrap; gap:11px; margin:0 0 8px}
+.btn{
+  font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:14px;
+  letter-spacing:-.005em; padding:10px 20px; border-radius:2px; cursor:pointer;
+  border:1px solid var(--ink); background:var(--ink); color:var(--bg);
+}
+.btn:hover{background:var(--copper); border-color:var(--copper); color:#fff}
+.btn.ghost{background:none; color:var(--ink); border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--copper); color:var(--copper); background:none}
+.btn:focus-visible{outline:2px solid var(--copper); outline-offset:3px}
+
+h2{
+  font-family:"Archivo",system-ui,sans-serif; font-weight:700;
+  font-size:clamp(1.5rem,3.2vw,2rem); line-height:1.1; letter-spacing:-.021em;
+  margin:0 0 14px; text-wrap:balance;
+}
+h3{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:1.15rem;
+  letter-spacing:-.011em; margin:32px 0 10px; text-wrap:balance}
+h4{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin:26px 0 9px}
+p{margin:0 0 15px}
+ul,ol{margin:0 0 15px; padding-left:1.15em}
+li{margin:0 0 7px}
+li::marker{color:var(--copper)}
+strong{font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",monospace; font-size:.88em; font-weight:500}
+code{background:var(--surface-2); padding:1px 5px; border-radius:2px}
+.sep{height:1px; background:var(--rule); border:0; margin:54px 0}
+section.blk{padding:14px 0 0}
+
+.thesis{
+  border-left:3px solid var(--copper); padding:4px 0 4px 22px; margin:0 0 24px;
+  font-family:"Archivo",system-ui,sans-serif; font-weight:600;
+  font-size:clamp(1.2rem,2.9vw,1.55rem); line-height:1.3; letter-spacing:-.017em;
+  max-width:30ch;
+}
+
+/* ---------- figures ---------- */
+figure{margin:0 0 26px}
+.figbox{border:1px solid var(--rule); background:var(--surface); padding:16px; overflow-x:auto}
+svg.fig{display:block; width:100%; height:auto; min-width:560px; color:var(--ink)}
+figcaption{font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.55;
+  color:var(--ink-faint); margin-top:10px}
+.f-grid{stroke:currentColor; opacity:.13; stroke-width:1; fill:none}
+.f-axis{stroke:currentColor; opacity:.42; stroke-width:1.3; fill:none}
+.f-lab{fill:currentColor; opacity:.62; font-family:"IBM Plex Mono",monospace; font-size:11px}
+.f-sig{stroke:var(--copper); stroke-width:2.6; fill:none; stroke-linejoin:round}
+.f-warn{stroke:var(--warn); stroke-width:1.6; stroke-dasharray:7 5; fill:none}
+.f-warnt{fill:var(--warn); font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600}
+.f-t{fill:currentColor; font-family:"Archivo",system-ui,sans-serif; font-size:12.5px; font-weight:600}
+.f-s{fill:currentColor; opacity:.65; font-family:"IBM Plex Mono",monospace; font-size:10.5px}
+.f-c{fill:var(--copper); font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600}
+.f-box{fill:var(--surface); stroke:currentColor; stroke-opacity:.45; stroke-width:1.4}
+.f-boxw{fill:var(--warn-wash); stroke:var(--warn); stroke-width:1.4}
+.f-boxc{fill:var(--copper-wash); stroke:var(--copper); stroke-width:1.6}
+.f-wire{stroke:currentColor; stroke-opacity:.5; stroke-width:1.4; fill:none}
+.f-hot{stroke:var(--copper); stroke-width:2.6; fill:none}
+
+/* ---------- callouts ---------- */
+.box{border:1px solid var(--rule); background:var(--surface); padding:18px 20px; margin:0 0 22px}
+.box>:last-child{margin-bottom:0}
+.box-t{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; margin:0 0 9px; color:var(--ink-faint)}
+.box.copper{border-color:var(--copper); background:var(--copper-wash)}
+.box.copper .box-t{color:var(--copper-deep)}
+.box.danger{border-color:var(--warn); background:var(--warn-wash)}
+.box.danger .box-t{color:var(--warn)}
+.box.verify{border-color:var(--trace); background:var(--trace-wash)}
+.box.verify .box-t{color:var(--trace)}
+.eq{font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:500;
+  background:var(--surface-2); border-left:3px solid var(--trace);
+  padding:12px 16px; margin:0 0 18px; overflow-x:auto}
+.quote{font-size:1.02rem; color:var(--ink-soft); font-style:italic;
+  border-left:2px solid var(--rule); padding-left:16px; margin:0 0 18px}
+.quote cite{display:block; font-style:normal; font-size:12px; color:var(--ink-faint);
+  margin-top:6px; font-family:"IBM Plex Mono",monospace}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto; margin:0 0 20px; border:1px solid var(--rule); background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:500px; font-size:14.5px}
+th,td{text-align:left; padding:9px 13px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.11em; text-transform:uppercase; color:var(--ink-faint);
+  background:var(--surface-2); border-bottom:1px solid var(--rule); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+.pn{font-family:"IBM Plex Mono",monospace; font-size:.92em; font-weight:500}
+.ok{color:var(--trace); font-weight:600}
+.no{color:var(--warn); font-weight:600}
+
+/* ---------- steps ---------- */
+.ladder{display:flex; flex-direction:column; gap:1px; background:var(--rule);
+  border:1px solid var(--rule); margin:0 0 22px}
+.rung{background:var(--surface); display:grid; grid-template-columns:44px 1fr;
+  gap:14px; padding:12px 15px; align-items:baseline}
+.rung .n{font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600; color:var(--copper)}
+.rung .t{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:15px; letter-spacing:-.008em}
+.rung .d{display:block; font-family:"Source Serif 4",serif; font-weight:400;
+  font-size:14.5px; color:var(--ink-soft); margin-top:2px}
+
+/* ---------- chapter chrome ---------- */
+.ch-head{border-bottom:2px solid var(--ink); padding:44px 0 20px; margin:0 0 28px}
+.ch-meta{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--copper); margin:0 0 10px}
+.ch-title{font-family:"Archivo",system-ui,sans-serif; font-weight:700;
+  font-size:clamp(1.8rem,4.4vw,2.7rem); line-height:1.03; letter-spacing:-.026em;
+  margin:0; text-wrap:balance}
+.pill{display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:9.5px;
+  font-weight:600; letter-spacing:.11em; text-transform:uppercase; border-radius:2px;
+  padding:2px 7px; margin-left:9px; vertical-align:middle}
+.pill.live{color:var(--trace); background:var(--trace-wash); border:1px solid var(--trace)}
+.pill.soon{color:var(--ink-faint); background:var(--surface-2); border:1px solid var(--rule)}
+.pager{display:flex; gap:12px; justify-content:space-between; margin:56px 0 0;
+  padding-top:22px; border-top:1px solid var(--rule)}
+.pager button{
+  flex:1; text-align:left; background:var(--surface); border:1px solid var(--rule);
+  padding:13px 16px; cursor:pointer; border-radius:2px; color:var(--ink);
+  font-family:"Archivo",system-ui,sans-serif; font-size:14px; font-weight:600;
+  letter-spacing:-.008em; min-width:0;
+}
+.pager button:hover{border-color:var(--copper); color:var(--copper)}
+.pager button:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+.pager button[disabled]{opacity:.35; cursor:default}
+.pager button span{display:block; font-family:"IBM Plex Mono",monospace; font-size:10px;
+  font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px}
+.pager .nx{text-align:right}
+.stub{border:1px dashed var(--rule); background:var(--surface); padding:26px 24px; margin:0}
+.stub p:last-child{margin-bottom:0}
+
+/* ---------- home contents ---------- */
+.toc-part{margin:0 0 20px}
+.toc-h{display:flex; align-items:baseline; gap:12px; border-bottom:1.5px solid var(--ink);
+  padding-bottom:6px; margin:0 0 2px}
+.toc-n{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  letter-spacing:.15em; color:var(--copper); white-space:nowrap}
+.toc-t{font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:1.05rem; letter-spacing:-.013em}
+.toc-c{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--ink-faint)}
+.toc-row{display:grid; grid-template-columns:30px 1fr; gap:12px; width:100%; text-align:left;
+  background:none; border:0; border-bottom:1px solid var(--rule-soft); padding:10px 0; cursor:pointer;
+  font-family:inherit; color:var(--ink)}
+.toc-row:hover .toc-rt{color:var(--copper)}
+.toc-row:focus-visible{outline:2px solid var(--copper); outline-offset:-2px}
+.toc-rn{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-faint); padding-top:2px}
+.toc-rt{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:15px;
+  letter-spacing:-.008em; margin:0 0 3px}
+.toc-rd{margin:0; font-size:14.5px; color:var(--ink-soft); line-height:1.5}
+
+.credit{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+  gap:20px 28px; margin-top:64px; padding-top:26px; border-top:2px solid var(--ink)}
+.credit-by{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 5px}
+.credit-name{font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:1.35rem;
+  letter-spacing:-.02em; line-height:1; margin:0 0 7px}
+.credit-line{font-size:15px; color:var(--ink-soft); margin:0; max-width:44ch}
+.credit-links{display:flex; flex-wrap:wrap; gap:8px}
+.credit-links a{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:13.5px;
+  color:var(--ink); text-decoration:none; border:1px solid var(--rule);
+  padding:8px 16px; border-radius:2px; background:var(--surface)}
+.credit-links a:hover{border-color:var(--copper); color:var(--copper)}
+.credit-links a:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+
+.foot{margin-top:26px; padding-top:22px; border-top:1px solid var(--rule);
+  font-size:13.5px; color:var(--ink-faint); font-family:"IBM Plex Mono",monospace; line-height:1.65}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed; top:49px; left:0; width:min(320px,86vw); z-index:35;
+    box-shadow:0 8px 40px rgba(0,0,0,.22); border-right:1px solid var(--rule)}
+  .side[hidden]{display:none!important}
+  .menu-btn{display:block}
+  main{padding:0 20px 80px}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle contents">☰ Contents</button>
+  <button class="brand" id="brandBtn">Power First <span>Online edition</span></button>
+  <span class="prog" id="prog">2 of 29 chapters published</span>
+</header>
+
+<div class="shell">
+  <aside class="side" id="side">
+    <input class="filter" id="filter" type="search" placeholder="Filter chapters…" aria-label="Filter chapters">
+    <nav id="nav"></nav>
+  </aside>
+
+  <main>
+    <!-- ================= HOME ================= -->
+    <div class="reader" id="view-home">
+      <div class="hero">
+        <p class="kicker">A practical book · free online edition</p>
+        <h1>Power First</h1>
+        <p class="tagline">How to choose and build the right power supply for any project</p>
+        <p class="standfirst">For B.Tech students and makers. Every circuit buildable on perfboard, every part orderable in India, every claim measured on a real bench.</p>
+        <div class="cta-row">
+          <button class="btn" id="startBtn">Start reading &rarr;</button>
+          <button class="btn ghost" id="sampleBtn">Jump to the GSM chapter</button>
+        </div>
+        <div class="cta-row" id="resumeRow" hidden>
+          <button class="btn ghost" id="resumeBtn">Continue reading</button>
+        </div>
+      </div>
+
+      <figure>
+        <div class="figbox">
+          <svg class="fig" viewBox="0 0 900 300" role="img" aria-label="An oscilloscope trace of a 3.3 volt rail. The rail sits flat at 3.3 volts but drops to about 2.6 volts five times, each dip lasting a fraction of a millisecond, crossing below the 2.8 volt brownout threshold marked as a dashed line. A multimeter measuring the same rail reads 3.29 volts because it averages and cannot see the dips.">
+            <g class="f-grid">
+              <path d="M160 40V210M260 40V210M360 40V210M460 40V210M560 40V210M660 40V210M760 40V210"/>
+              <path d="M60 80H860M60 120H860M60 160H860M60 200H860"/>
+            </g>
+            <path class="f-axis" d="M60 40V210H860"/>
+            <text class="f-lab" x="8" y="60">3.3 V</text>
+            <text class="f-lab" x="8" y="140">2.8 V</text>
+            <text class="f-lab" x="8" y="204">2.4 V</text>
+
+            <path class="f-warn" d="M60 20H98"/>
+            <text class="f-warnt" x="106" y="24">2.8 V brownout threshold — below this, the chip resets</text>
+            <path class="f-warn" d="M60 136H860"/>
+
+            <path class="f-sig" d="M60 56H180L185 168H193C202 168 208 56 220 56H320L325 168H333C342 168 348 56 360 56H460L465 168H473C482 168 488 56 500 56H600L605 168H613C622 168 628 56 640 56H740L745 168H753C762 168 768 56 780 56H860"/>
+
+            <text class="f-s" x="60" y="232">time — 1 ms per division · each dip lasts about 200 µs</text>
+
+            <rect class="f-box" x="60" y="248" width="238" height="42" rx="2"/>
+            <text class="f-s" x="72" y="264">YOUR MULTIMETER READS</text>
+            <text class="f-t" x="72" y="282">3.29 V — looks perfect</text>
+
+            <rect class="f-boxw" x="314" y="248" width="238" height="42" rx="2"/>
+            <text class="f-s" x="326" y="264">WHAT THE RAIL ACTUALLY DOES</text>
+            <text class="f-warnt" x="326" y="282">2.61 V, 216 times a second</text>
+          </svg>
+        </div>
+        <figcaption>The whole book in one picture. A multimeter averages, so a rail that collapses for 200 µs still reads 3.29 V. The chip resets anyway, and you go looking for the bug in your code.</figcaption>
+      </figure>
+
+      <hr class="sep">
+
+      <section class="blk">
+        <h2>Why this book exists</h2>
+        <p class="thesis">Students don&rsquo;t fail at the equations. They fail when the calculated design meets real hardware.</p>
+        <p>There are excellent books on power supply design. They teach loop compensation, phase margin, transformer core geometry and winding arrangement. Not one of them helps the student whose ESP32 resets when the servo moves.</p>
+        <p>That gap is where almost every real failure lives. A calculated inductor value that maps onto five thousand catalogue parts. A capacitor chosen by capacitance when ESR was what mattered. A regulator sold as 1&nbsp;A that thermally delivers 300&nbsp;mA. A supply that behaves perfectly on the bench and collapses the moment a radio transmits.</p>
+        <p>This book teaches the part that gets skipped: <strong>how to work out what your project actually needs, choose parts you can buy today, build it on perfboard, and prove with measurements that it works.</strong></p>
+      </section>
+
+      <section class="blk">
+        <h3>Who it&rsquo;s for</h3>
+        <ul>
+          <li>B.Tech students who can build circuits but have never really read a datasheet</li>
+          <li>Makers whose projects work on USB and fail on a battery</li>
+          <li>Anyone who has blamed their code for a problem that was really their power supply</li>
+        </ul>
+        <h3>What it deliberately leaves out</h3>
+        <p>No transformer winding. No loop compensation. No PCB layout &mdash; that is book two. You will learn to <em>select</em> components, not design magnetics, and to <em>measure</em> a supply rather than compensate one.</p>
+      </section>
+
+      <hr class="sep">
+
+      <section class="blk">
+        <h2>The eight steps</h2>
+        <p>Every chapter applies the same sequence. By the end you will run it without thinking.</p>
+        <div class="ladder">
+          <div class="rung"><span class="n">00</span><span class="t">Profile the load<span class="d">Every rail. Average current, peak current, how long the peak lasts, how often, and how much noise it tolerates.</span></span></div>
+          <div class="rung"><span class="n">01</span><span class="t">Write the spec<span class="d">Input voltage range, output voltage, average and peak current, ripple limit, efficiency target, thermal ceiling.</span></span></div>
+          <div class="rung"><span class="n">02</span><span class="t">Choose the source<span class="d">Mains, adapter, USB, or which battery chemistry and how many cells in series.</span></span></div>
+          <div class="rung"><span class="n">03</span><span class="t">Choose the topology<span class="d">Linear, LDO, buck, boost or buck-boost. One decision table settles it.</span></span></div>
+          <div class="rung"><span class="n">04</span><span class="t">Choose the parts<span class="d">IC, inductor, capacitors, MOSFET, diode &mdash; each from the handful of datasheet numbers that actually decide.</span></span></div>
+          <div class="rung"><span class="n">05</span><span class="t">Check the heat<span class="d">Dissipation and temperature rise, calculated before you spend a rupee. This step kills more designs than any other.</span></span></div>
+          <div class="rung"><span class="n">06</span><span class="t">Build it on perfboard<span class="d">Short fat wires on the high-current loop, star ground, bulk capacitance at the load end.</span></span></div>
+          <div class="rung"><span class="n">07</span><span class="t">Measure and prove it<span class="d">The six measurements. If you have not measured it, you do not know that it works.</span></span></div>
+        </div>
+      </section>
+
+      <hr class="sep">
+
+      <section class="blk">
+        <h2>Contents</h2>
+        <p>Chapters go live as they are written and measured. Nothing is published until the circuit in it has been built.</p>
+        <div id="toc"></div>
+      </section>
+
+      <footer class="credit">
+        <div class="credit-who">
+          <p class="credit-by">Written by</p>
+          <p class="credit-name">Yogesh Bawane</p>
+        </div>
+        <nav class="credit-links" aria-label="Impulse Tech elsewhere">
+          <a href="https://www.youtube.com/@ImpulseTech" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://www.instagram.com/impulsetechy/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.linkedin.com/in/yogesh-bawane/" target="_blank" rel="noopener">LinkedIn</a>
+        </nav>
+      </footer>
+
+      <p class="foot">
+        Free to read online. Print edition when all twenty-nine chapters are done.<br>
+        Prices quoted in rupees, sourced from Robu, Ktron and RoboticsDNA, dated at the point of writing.<br>
+        Every datasheet figure is cited to a manufacturer document, not to another book.
+      </p>
+    </div>
+
+    <!-- ================= CHAPTER 1 ================= -->
+    <div class="reader" id="view-ch1" hidden>
+      <div class="ch-head">
+        <p class="ch-meta">Part 0 · Chapter 1<span class="pill live">Published</span></p>
+        <h1 class="ch-title">Six failures, one cause</h1>
+      </div>
+
+      <p>Here are six messages from the channel. They arrived separately, from six different people, about six different projects. Five of the six people believed they had a software problem.</p>
+      <p>All six are the same problem.</p>
+
+      <h3>1.1&ensp;The six</h3>
+
+      <p class="quote">&ldquo;My ESP32 keeps restarting whenever it connects to WiFi. Serial monitor shows brownout detector was triggered. Code is fine, I tested it.&rdquo;</p>
+      <p>The code <em>is</em> fine. When an ESP32 turns on its radio, current draw jumps from around 80&nbsp;mA to peaks of 300&ndash;500&nbsp;mA in a few microseconds. If it is running from a laptop USB port through a thin cable, or from an <span class="pn">AMS1117</span> that is already near its thermal limit, the 3.3&nbsp;V rail sags. The chip has a brownout detector watching that rail, and when it dips below roughly 2.8&nbsp;V the chip does exactly what it was designed to do &mdash; it resets. The error message is not a bug report. It is the chip telling you, accurately, that you did not feed it.</p>
+
+      <p class="quote">&ldquo;When my servo moves, the OLED display goes blank and I have to restart.&rdquo;</p>
+      <p>An MG996R servo draws about 500&nbsp;mA while turning and up to 2.5&nbsp;A if it stalls. Your OLED wants 20&nbsp;mA and shares the same 5&nbsp;V rail and the same thin wire. When the servo starts, the rail dips, and the display controller loses its state on the I²C bus. The display is not faulty. It is downstream of a motor.</p>
+
+      <p class="quote">&ldquo;My SIM800 restarts whenever it sends an SMS. I am using a 5V 2A adapter.&rdquo;</p>
+      <p>The adapter can deliver two amps &mdash; slowly. The module wants two amps for 577&nbsp;microseconds, two hundred and sixteen times a second. Those are completely different requirements, and almost nothing you can buy is labelled for the second one. This one gets a whole chapter.</p>
+
+      <p class="quote">&ldquo;My 7805 gets so hot I cannot touch it. Is it damaged?&rdquo;</p>
+      <p>It is not damaged, it is doing precisely what a linear regulator does. Feed it 12&nbsp;V, take 5&nbsp;V out at half an amp, and the difference has nowhere to go but heat:</p>
+      <div class="eq">P = (12 V − 5 V) × 0.5 A = 3.5 W</div>
+      <p>A bare TO-220 package can shed roughly one watt before it becomes untouchable. You asked it to shed three and a half. The part is fine; the arithmetic was never done.</p>
+
+      <p class="quote">&ldquo;My motor driver works when powered from USB but not from a 9V battery.&rdquo;</p>
+      <p>A 9&nbsp;V PP3 battery has an internal resistance of roughly 1.7&nbsp;Ω when fresh, and considerably more once used. Ask it for 500&nbsp;mA and you lose most of a volt inside the battery itself before any current reaches your circuit. That little rectangular battery is one of the weakest power sources you can buy, and it is on the shelf of every electronics shop, which is why it ends up in so many projects that fail.</p>
+
+      <p class="quote">&ldquo;It was working perfectly on breadboard. After I soldered everything it stopped working.&rdquo;</p>
+      <p>Something in the layout changed. The loop got longer, the wire got thinner, or a decoupling capacitor moved away from the pin it was protecting. Nothing in the schematic changed at all &mdash; and that is exactly why it is so confusing.</p>
+
+      <h3>1.2&ensp;What they have in common</h3>
+      <p class="thesis">In every one of these, the voltage went somewhere it should not have &mdash; for a moment too short to see.</p>
+      <p>Not one of them is a component failure. Not one is a code bug. In each case a rail moved outside the window its load needed, briefly, and something downstream reacted correctly to a condition its designer anticipated.</p>
+
+      <h3>1.3&ensp;Why you did not see it</h3>
+      <p>Because you measured with a multimeter, and <strong>a multimeter cannot see this.</strong></p>
+      <p>A digital multimeter samples a few times per second and reports an average. The dips in these stories last between 200&nbsp;µs and a few milliseconds. Averaged into a one-second window they move the reading by a few hundredths of a volt. Your meter says 3.29&nbsp;V, which looks perfect, and it is not lying &mdash; it is answering a different question from the one you needed to ask.</p>
+      <div class="box danger">
+        <p class="box-t">The single most expensive habit in this hobby</p>
+        <p>Trusting a multimeter to tell you whether a power supply is healthy. It tells you the average. Almost every failure in this book is about what happens for a fraction of a millisecond, and the average is exactly where that information goes to die.</p>
+      </div>
+      <p>This is why chapter 2 is about your bench before chapter 3 is about your circuit. You cannot debug what you cannot see, and the research is unambiguous that not knowing where to measure &mdash; or what a correct waveform even looks like &mdash; is the single biggest thing standing between students and working power supplies.</p>
+
+      <h3>1.4&ensp;What this book does instead</h3>
+      <p>Most power supply teaching starts with a topology. Here is a buck converter, here is the duty cycle equation, calculate L, calculate C, simulate it, done.</p>
+      <p>That order is backwards, and it is why the calculations stop matching reality the moment real parts are involved. You cannot choose a topology before you know what the load does. You cannot choose a part before you know how much heat you can get rid of. And you cannot claim any of it works until you have put a probe on it.</p>
+      <p>So this book runs in the order the work actually happens &mdash; the eight steps. You will not see a converter topology until chapter 13, and by then you will already be able to say exactly what your project needs, which is the part everybody skips.</p>
+
+      <div class="box copper">
+        <p class="box-t">Decision rules — chapter 1</p>
+        <ul>
+          <li>When something resets, browns out, flickers or behaves differently on battery than on USB, <strong>suspect power first.</strong></li>
+          <li>A multimeter measures the average. Failures live in the moments the average hides.</li>
+          <li>The load decides the supply. Never the other way round.</li>
+          <li>A regulator that runs hot is not faulty. It is telling you the arithmetic was skipped.</li>
+        </ul>
+      </div>
+
+      <h3>1.5&ensp;Exercises</h3>
+      <ol>
+        <li>Take a project you have built. Write down every part, and next to it the current it draws when idle and the current it draws at its busiest. Where you do not know, write &ldquo;don&rsquo;t know&rdquo; &mdash; that list of blanks is chapter 3.</li>
+        <li>An LM7812 drops 24&nbsp;V to 12&nbsp;V at 300&nbsp;mA. How many watts does it dissipate? Would you be able to hold it?</li>
+        <li>Find one comment or forum post describing a project that &ldquo;works on USB but not on battery.&rdquo; Which of the six stories above is it?</li>
+      </ol>
+    </div>
+
+    <!-- ================= CHAPTER 26 ================= -->
+    <div class="reader" id="view-ch26" hidden>
+      <div class="ch-head">
+        <p class="ch-meta">Part 6 · Chapter 26<span class="pill live">Published</span></p>
+        <h1 class="ch-title">Pulsed loads: powering a GSM or LTE module from a battery</h1>
+      </div>
+
+      <h3>26.1&ensp;The symptom</h3>
+      <p class="quote">&ldquo;Sir my SIM800 keeps restarting whenever it sends SMS. I am using 5V 2A adapter only. Everything else works fine. Please help.&rdquo;<cite>— the most common power question on the channel</cite></p>
+      <p>This module has never had a code problem. It has a supply that can deliver two amps slowly, and a load that wants two amps in half a millisecond. Those are not the same requirement, and almost nothing you can buy is labelled for the second one.</p>
+
+      <h3>26.2&ensp;The number on the box is not the number you need</h3>
+      <p>Open the SIM800 hardware design guide. It says the supply &ldquo;must be able to provide sufficient current up to 2&nbsp;A.&rdquo; True, but incomplete. Two pages later the timing diagram tells you what actually happens: the transmit burst lasts <strong>577&nbsp;µs</strong> inside a <strong>4.615&nbsp;ms</strong> frame, and the permitted droop on VBAT is <strong>350&nbsp;mV</strong>.</p>
+      <div class="eq">duty cycle = 577 µs ÷ 4 615 µs = 12.5 %<br>average during transmit ≈ 2 A × 0.125 + idle ≈ 250–350 mA</div>
+      <p>So the module draws about a third of an amp on average, and spikes to two amps for roughly half a millisecond, two hundred and sixteen times a second. <strong>You do not need a 2&nbsp;A continuous supply. You need a supply that survives a 2&nbsp;A spike.</strong></p>
+
+      <div class="box copper">
+        <p class="box-t">And if you are using a SIM7670 or A7670?</p>
+        <p>Different load entirely, despite the similar name. The SIM7672X series wants <strong>3.4&ndash;4.2&nbsp;V at VBAT, typically 3.8&nbsp;V &mdash; not 5&nbsp;V</strong> &mdash; and LTE-FDD B1 transmit at 23&nbsp;dBm draws about <strong>574&nbsp;mA typical</strong>. Its design guide asks for only ≥100&nbsp;µF of bulk. The savage 2&nbsp;A burst belongs to the 2G parts. The &ldquo;5&nbsp;V 2&nbsp;A&rdquo; printed on your breakout board is the recommended <em>adapter</em>, sized with headroom &mdash; it was never the module&rsquo;s draw.</p>
+      </div>
+
+      <h3>26.3&ensp;Where the current actually comes from</h3>
+      <p class="thesis">The regulator supplies the average. The capacitor supplies the burst.</p>
+      <p>During those 577&nbsp;µs the regulator cannot possibly respond &mdash; its control loop is far too slow. The charge has to come from a capacitor sitting next to the module, and the voltage it loses while supplying that charge is:</p>
+      <div class="eq">ΔV  =  (I_peak − I_reg) × t_burst ÷ C   +   I_peak × ESR</div>
+      <p>Two terms, and beginners only ever think about the first.</p>
+
+      <h4>Work it, with a 350 mV budget</h4>
+      <p><strong>The ESR term first, because it is the one that ruins designs.</strong> A generic 1000&nbsp;µF 16&nbsp;V electrolytic from the local market has an ESR around 0.15&nbsp;Ω.</p>
+      <div class="eq">2 A × 0.15 Ω = 300 mV — instantly, before the capacitor has discharged at all</div>
+      <p>Eighty-six percent of your entire budget, spent on a parasitic. The capacitance was never the problem. Swap to a low-ESR part at roughly 0.05&nbsp;Ω and the same 2&nbsp;A costs you 100&nbsp;mV, leaving 250&nbsp;mV for the capacitor to actually work with.</p>
+      <p>Now size the capacitance, assuming your regulator can hold up 1&nbsp;A of the 2&nbsp;A peak:</p>
+      <div class="eq">C = (2 A − 1 A) × 577 µs ÷ 0.25 V = 2 308 µF   →   use 2 200–3 300 µF, low ESR</div>
+      <p>Plus 10&nbsp;µF and 100&nbsp;nF ceramics right at the pin for the fast edges, and the 5.1&nbsp;V zener the datasheet recommends.</p>
+
+      <div class="box verify">
+        <p class="box-t">Check it against the manufacturer</p>
+        <p>SIMCom&rsquo;s A7670 guide says: <strong>≥300&nbsp;µF if your supply can source the full peak, and ≥1000&nbsp;µF if it cannot.</strong> Our arithmetic lands in the same place. That is the point of this chapter &mdash; the datasheet number is not magic, it is this equation with their assumptions plugged in. Once you can derive it, you can adapt it when your regulator, your budget or your burst is different.</p>
+      </div>
+
+      <h3>26.4&ensp;The battery is part of the power supply</h3>
+      <p>You can get every capacitor right and still fail, because the cell itself has resistance and the same burst flows through it.</p>
+      <div class="eq">V_sag = I_peak × R_internal</div>
+      <div class="scroll">
+      <table>
+        <thead><tr><th>Cell</th><th class="num">R<sub>internal</sub></th><th class="num">Sag at 2 A</th><th>Verdict for a GSM burst</th></tr></thead>
+        <tbody>
+          <tr><td>CR2032 coin cell</td><td class="num">~10–15 Ω</td><td class="num">collapses</td><td class="no">Impossible</td></tr>
+          <tr><td>AA alkaline</td><td class="num">150–300 mΩ</td><td class="num">300–600 mV</td><td class="no">No</td></tr>
+          <tr><td>Cheap market 18650</td><td class="num">~150 mΩ</td><td class="num">300 mV</td><td class="no">Budget gone in the cell alone</td></tr>
+          <tr><td>Good 18650</td><td class="num">60–100 mΩ</td><td class="num">120–200 mV</td><td>Workable</td></tr>
+          <tr><td>High-drain 18650 <span class="pn">30Q / VTC6 / HG2</span></td><td class="num">20–30 mΩ</td><td class="num">40–60 mV</td><td class="ok">Good</td></tr>
+          <tr><td>RC LiPo pouch</td><td class="num">5–20 mΩ</td><td class="num">10–40 mV</td><td class="ok">Best</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>For a pulsed load, choose the cell by internal resistance, not by capacity.</strong> A 3000&nbsp;mAh cell that sags 300&nbsp;mV is worse than a 2000&nbsp;mAh cell that sags 50&nbsp;mV, and the mAh number on the wrapper tells you nothing about which one you are holding.</p>
+
+      <h3>26.5&ensp;Five architectures, compared</h3>
+      <div class="scroll">
+      <table>
+        <thead><tr><th></th><th>Architecture</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td class="num">A</td><td>1S Li-ion straight to VBAT, with bulk capacitance</td><td><span class="ok">Recommended.</span> The cell&rsquo;s 3.0&ndash;4.2&nbsp;V window <em>is</em> the module&rsquo;s 3.4&ndash;4.2&nbsp;V window. No conversion, no loss, no switching noise. You lose a little capacity at the discharge tail because the module cuts out near 3.5&nbsp;V under load. Needs protection and a genuinely low-ESR bulk cap.</td></tr>
+          <tr><td class="num">B</td><td>1S Li-ion &rarr; boost to 5&nbsp;V &rarr; module&rsquo;s own regulator</td><td>Double conversion for nothing. Worse, 2&nbsp;A out at 5&nbsp;V needs about <strong>3.2&nbsp;A from the cell</strong> &mdash; an <span class="pn">SX1308</span> at ₹30 or an <span class="pn">MT3608</span> cannot come close.</td></tr>
+          <tr><td class="num">C</td><td>2S Li-ion &rarr; buck to 4.0&nbsp;V</td><td>Works, and <span class="pn">LM2596</span> at ₹44 is SIMCom&rsquo;s own reference part. But 2S brings balancing, a BMS and a 2S charger. Choose this when the project needs other rails too.</td></tr>
+          <tr><td class="num">D</td><td>2S &rarr; 7805 &rarr; module</td><td><span class="no">Fails twice.</span> The 7805 needs ≥7&nbsp;V in and a discharged 2S pack sits at 6.0&nbsp;V. And at the peak it burns 3.4&nbsp;V × 2&nbsp;A = 6.8&nbsp;W across the pass element.</td></tr>
+          <tr><td class="num">E</td><td>Certified adapter &rarr; <span class="pn">LM2596</span> &rarr; 4.0&nbsp;V</td><td>Correct for a bench prototype. Not battery operated, so it does not answer the question &mdash; but build this first to prove the circuit before you add the battery.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>26.6&ensp;What most people draw, and what actually works</h3>
+      <figure>
+        <div class="figbox">
+          <svg class="fig" viewBox="0 0 860 380" role="img" aria-label="Two block diagrams compared. In the first, a cell wires straight to a GSM module and the module resets on transmit. In the second, the cell passes through protection and a reverse-polarity MOSFET to a node carrying 2200 microfarads of low-ESR bulk capacitance plus 10 microfarad and 100 nanofarad ceramics and a 5.1 volt zener, then a short fat wire to the module's VBAT pin, with a star ground returning to the cell negative.">
+            <text class="f-s" x="0" y="14">WHAT MOST PEOPLE BUILD</text>
+            <rect class="f-box" x="0" y="28" width="128" height="46" rx="2"/>
+            <text class="f-t" x="14" y="49">18650 cell</text>
+            <text class="f-s" x="14" y="65">3.0–4.2 V</text>
+            <path class="f-wire" d="M128 44H236M128 62H236"/>
+            <rect class="f-boxw" x="236" y="28" width="150" height="46" rx="2"/>
+            <text class="f-t" x="250" y="49">SIM800 module</text>
+            <text class="f-s" x="250" y="65">VBAT / GND</text>
+            <text class="f-warnt" x="404" y="45">2 A burst → 500 mV+ dip</text>
+            <text class="f-warnt" x="404" y="62">→ module resets mid-SMS</text>
+
+            <path d="M0 104H860" stroke="currentColor" stroke-opacity=".14" stroke-width="1" fill="none"/>
+
+            <text class="f-s" x="0" y="134">WHAT ACTUALLY WORKS</text>
+            <rect class="f-box" x="0" y="150" width="120" height="46" rx="2"/>
+            <text class="f-t" x="12" y="171">18650</text>
+            <text class="f-s" x="12" y="187">low R, 30Q</text>
+            <path class="f-wire" d="M120 166H160"/>
+            <rect class="f-box" x="160" y="150" width="112" height="46" rx="2"/>
+            <text class="f-t" x="172" y="171">Protection</text>
+            <text class="f-s" x="172" y="187">BMS / DW01</text>
+            <path class="f-wire" d="M272 166H312"/>
+            <rect class="f-box" x="312" y="150" width="122" height="46" rx="2"/>
+            <text class="f-t" x="324" y="171">Reverse</text>
+            <text class="f-s" x="324" y="187">P-MOSFET</text>
+
+            <path class="f-hot" d="M434 166H700"/>
+            <circle cx="536" cy="166" r="4.5" fill="currentColor"/>
+            <path class="f-hot" d="M536 166V228"/>
+            <rect class="f-boxc" x="428" y="228" width="216" height="66" rx="2"/>
+            <text class="f-c" x="440" y="248">2200 µF low-ESR</text>
+            <text class="f-c" x="440" y="264">∥ 10 µF ∥ 100 nF</text>
+            <text class="f-c" x="440" y="280">∥ 5.1 V zener</text>
+            <path class="f-wire" d="M536 294V330"/>
+            <rect class="f-boxc" x="700" y="150" width="150" height="46" rx="2"/>
+            <text class="f-t" x="712" y="171">SIM800 VBAT</text>
+            <text class="f-s" x="712" y="187">3.4–4.4 V</text>
+            <path class="f-wire" d="M60 196V330H790V196"/>
+            <text class="f-s" x="66" y="346">star ground at cell negative</text>
+            <path class="f-hot" d="M536 132H700" stroke-dasharray="4 4" stroke-width="1.4"/>
+            <text class="f-c" x="546" y="126">short, fat wire — this is the burst loop</text>
+          </svg>
+        </div>
+        <figcaption>Fig. 26.4 — The bulk capacitor belongs beside the module, not beside the battery. Every millimetre of thin wire between the capacitor and the VBAT pin adds resistance and inductance directly into the path the 2 A burst has to travel.</figcaption>
+      </figure>
+
+      <h3>26.7&ensp;Build it on perfboard</h3>
+      <ul>
+        <li>Bulk capacitor <strong>within 20&nbsp;mm of the VBAT pin</strong>. At the battery end it does almost nothing.</li>
+        <li>The loop from capacitor, through VBAT, through GND and back to the capacitor is <em>the</em> loop. Keep it short and use 20&nbsp;AWG. Not jumper wire.</li>
+        <li>Star ground at the cell negative. The module&rsquo;s ground return does not pass through your microcontroller&rsquo;s ground.</li>
+        <li>Ceramics closest to the pin, electrolytic just behind them. Small and fast in front, big and slow behind.</li>
+        <li>Never power the module from an Arduino&rsquo;s 5&nbsp;V pin. That regulator cannot source the burst, and now two things brown out instead of one.</li>
+      </ul>
+
+      <h3>26.8&ensp;Measure it</h3>
+      <div class="box verify">
+        <p class="box-t">Scope setup</p>
+        <p>Probe on VBAT, ground spring at the module&rsquo;s own ground pin. DC coupled, 100&nbsp;mV/div, timebase 200&nbsp;µs/div, trigger on the falling edge about 100&nbsp;mV below the resting voltage. Send an SMS.</p>
+      </div>
+      <p>You are looking for a train of dips spaced 4.6&nbsp;ms apart. <strong>Pass condition: each dip is under 350&nbsp;mV and the rail recovers fully before the next one arrives.</strong> If the dips get progressively deeper across the burst train, your capacitor is not recharging in time &mdash; the regulator is the limit, not the capacitor.</p>
+      <p>Take this trace twice, once with the original supply and once with the fix, and put them side by side. That single pair of images is the most persuasive thing in the chapter.</p>
+
+      <h3>26.9&ensp;Decision rules</h3>
+      <div class="box copper">
+        <p class="box-t">Keep these</p>
+        <ul>
+          <li>Read the <strong>burst spec</strong>, not the headline current. Peak, duration and repetition rate.</li>
+          <li>The regulator supplies the average. <strong>The capacitor supplies the burst.</strong></li>
+          <li>Budget <strong>ESR before capacitance</strong>. It can spend your entire allowance before the capacitor does any work.</li>
+          <li>If the load&rsquo;s voltage window already matches the battery&rsquo;s, <strong>do not convert at all.</strong></li>
+          <li>For pulsed loads, choose cells by <strong>internal resistance</strong>, not capacity.</li>
+        </ul>
+      </div>
+
+      <h3>26.10&ensp;Common mistakes</h3>
+      <ul>
+        <li>A 2&nbsp;A adapter feeding thin wires with the capacitor at the wrong end &mdash; the original question, exactly.</li>
+        <li>A generic high-ESR electrolytic, chosen on capacitance alone.</li>
+        <li>Powering the module from the Arduino&rsquo;s 5&nbsp;V pin.</li>
+        <li>A coin cell or AAA pack for anything containing a radio.</li>
+        <li>Assuming a SIM7670 behaves like a SIM800 because both say &ldquo;GSM module&rdquo; on the listing.</li>
+      </ul>
+
+      <h3>26.11&ensp;Exercises</h3>
+      <ol>
+        <li>Your regulator can hold 1.5&nbsp;A of the 2&nbsp;A peak and you allow 300&nbsp;mV of droop. The capacitor&rsquo;s ESR is 0.04&nbsp;Ω. What capacitance do you need?</li>
+        <li>A cell sags 250&nbsp;mV at 2&nbsp;A. What is its internal resistance, and would you use it for this design?</li>
+        <li>Architecture A cuts out around 3.5&nbsp;V under load instead of 3.0&nbsp;V. Using a discharge curve, roughly what percentage of capacity does that cost &mdash; and is it worth the efficiency you gain?</li>
+      </ol>
+
+      <p class="foot">Sources — SIM800 Hardware Design v1.09 (burst timing, 350 mV droop, capacitor recommendation) · SIM7672X Series Hardware Design v1.01 (VBAT range, LTE transmit current, 100 µF bulk) · A7670 Series Hardware Design v1.00 (peak current, 300 mV target, 300/1000 µF guidance). Prices from Robu.in and Ktron.in.</p>
+    </div>
+
+    <!-- ================= STUB ================= -->
+    <div class="reader" id="view-stub" hidden>
+      <div class="ch-head">
+        <p class="ch-meta" id="stubMeta"></p>
+        <h1 class="ch-title" id="stubTitle"></h1>
+      </div>
+      <div class="stub">
+        <p class="box-t">Not written yet</p>
+        <p id="stubDesc"></p>
+        <p style="margin-top:14px;color:var(--ink-faint);font-size:15px">Chapters are published only after the circuit in them has been built on perfboard and measured. This one is in the queue.</p>
+      </div>
+    </div>
+
+    <div class="reader"><div class="pager" id="pager" hidden></div></div>
+  </main>
+</div>
+
+<script>
+const PARTS = [
+ {n:"Part 0", t:"Why circuits fail", ch:[
+  {i:1,  t:"Six failures, one cause", d:"Six real messages from the channel, each traced back to power. Why a multimeter cannot see the problem, and what this book does instead.", live:"ch1"},
+  {i:2,  t:"Your bench, and what it costs", d:"Multimeter, a basic scope, USB power meter, a DIY constant-current load. Proof that every measurement in this book is within reach."}]},
+ {n:"Part 1", t:"Specify before you buy", ch:[
+  {i:3,  t:"Profile the load", d:"The table you fill in before you spend anything. Average, peak, burst, inrush, stall — and why the sum of every datasheet maximum is the wrong budget."},
+  {i:4,  t:"Voltage, and why 3.3 V is not 3.3 V", d:"Tolerance windows, headroom, dropout, brownout thresholds. What a rail actually has to hold, and when."},
+  {i:5,  t:"Current, and where datasheets mislead", d:"Average against peak against burst. Duty cycle. Why “2 A” printed on a module box is not 2 A of draw."},
+  {i:6,  t:"Power, energy and runtime", d:"Watts, watt-hours, amp-hours. How long it will actually run, and how to size a battery backwards from that answer."},
+  {i:7,  t:"Heat — the one equation that decides everything", d:"P = (Vin − Vout) × Iout, thermal resistance, the one-watt rule for a bare TO-220, heatsinks and derating. Why a “1 A” regulator gives you 300 mA."},
+  {i:8,  t:"The power tree", d:"Your whole project on one page. Three worked examples — line follower, IoT sensor node, GSM tracker."}]},
+ {n:"Part 2", t:"Where the power comes from", ch:[
+  {i:9,  t:"Sources compared, including mains", d:"Adapter, USB, battery, mains. The AC ladder from a certified adapter to an offline switcher IC, and the safety rules that are not negotiable."},
+  {i:10, t:"Batteries, plainly", d:"18650, LiPo, LiFePO4, NiMH, alkaline, SLA, coin cell. Internal resistance, not capacity, decides your peak current. C-rate in plain language."},
+  {i:11, t:"1S, 2S, 3S", d:"Series adds voltage, parallel adds current. Why everything gets harder past 1S: balancing, drift, and the difference between a BMS and a charger."},
+  {i:12, t:"Charging, and charging while running", d:"CC/CV explained simply. Setting charge current. The power-path distinction. What is actually inside a protected TP4056 module."}]},
+ {n:"Part 3", t:"Linear regulators", ch:[
+  {i:13, t:"How a linear regulator actually works", d:"Pass element and error amplifier as intuition rather than algebra. Why linear is always the honest first question."},
+  {i:14, t:"The 7805, in full", d:"When it is right and when it is wrong. Thermal maths, heatsinking, every capacitor explained. Why it fails on a battery."},
+  {i:15, t:"LDOs, and the ESR stability trap", d:"Dropout, quiescent current, PSRR, and why the wrong output capacitor makes an LDO oscillate. Why AMS1117 cannot make 3.3 V from a Li-ion."}]},
+ {n:"Part 4", t:"Switching regulators", ch:[
+  {i:16, t:"The buck converter", d:"How it works and how to design one that survives. Choosing switching frequency, then L, Cin, Cout and the feedback divider from it."},
+  {i:17, t:"Choosing an inductor without drowning", d:"Saturation current against RMS current against DCR against core material. What changes between the ₹9 part and the ₹175 one — with saturation shown on a scope."},
+  {i:18, t:"Choosing capacitors", d:"Why two 10 µF parts behave nothing alike. Ceramic, electrolytic and polymer. ESR, ripple current rating, and the DC bias derating that silently halves a ceramic."},
+  {i:19, t:"Boost and buck-boost", d:"Why input current is higher than output current. 1S Li-ion to 5 V done honestly, and what to do when Vin crosses Vout mid-discharge."},
+  {i:20, t:"Modules, and when to stop trusting them", d:"What the printed ratings really mean, what is missing from a ₹44 board, and when to build your own instead."}]},
+ {n:"Part 5", t:"Switches, diodes and survival", ch:[
+  {i:21, t:"MOSFETs — the numbers that matter", d:"On-resistance at the gate voltage you actually have, gate charge, safe operating area, body diode. Why the ₹18 MOSFET fails on a 5 V gate and the ₹39 one works."},
+  {i:22, t:"Diodes — Schottky, fast, and wrong", d:"Forward voltage, reverse recovery, reverse voltage rating, package thermal. Why a 1N4007 in a buck converter is a mains rectifier in the wrong job."},
+  {i:23, t:"Protection that actually protects", d:"Reverse polarity with a P-channel MOSFET instead of a series diode, polyfuses, TVS clamps, inrush limiting, overcurrent."},
+  {i:24, t:"Motors, servos and other noisy loads", d:"Stall current, back-EMF, and why the logic rail must never share a supply with a motor. Separate rails, common ground, star point."}]},
+ {n:"Part 6", t:"Build it and prove it", ch:[
+  {i:25, t:"Building on perfboard", d:"The wiring rules that are really layout rules. Short fat wires on the high-current loop, star ground, where the sense wire goes."},
+  {i:26, t:"Pulsed loads — the GSM and LTE supply", d:"Battery-powered supply for a cellular module, worked end to end from the burst spec to the scope trace.", live:"ch26"},
+  {i:27, t:"The six measurements", d:"Each one demonstrated on the same supply, with the probe technique that makes ripple measurements honest rather than flattering."},
+  {i:28, t:"Debugging — where to put the probe", d:"The flowchart. What a correct waveform looks like, so a wrong one is recognisable. Ten cases from real comments."},
+  {i:29, t:"Capstone: design your own", d:"Pick your own project. Run the eight steps. Select the parts, order them, solder them from your own circuit diagram, measure it, write it up."}]}
+];
+
+const FLAT = [];
+PARTS.forEach(p => p.ch.forEach(c => FLAT.push({...c, part:p.n, partT:p.t})));
+
+const $ = id => document.getElementById(id);
+const nav = $('nav'), toc = $('toc'), pager = $('pager');
+let current = 'home';
+
+/* ---- build sidebar + contents ---- */
+PARTS.forEach(p => {
+  const h = document.createElement('p');
+  h.className = 'side-part'; h.textContent = p.n + ' · ' + p.t;
+  nav.appendChild(h);
+  p.ch.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'side-link' + (c.live ? ' live' : '');
+    b.dataset.ch = c.i;
+    b.innerHTML = '<i class="dot"></i><span class="num">'+String(c.i).padStart(2,'0')+'</span><span>'+c.t+'</span>';
+    b.addEventListener('click', () => go(c.i));
+    nav.appendChild(b);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'toc-part';
+  const done = p.ch.filter(c=>c.live).length;
+  wrap.innerHTML = '<div class="toc-h"><span class="toc-n">'+p.n.toUpperCase()+'</span>'+
+    '<span class="toc-t">'+p.t+'</span><span class="toc-c">'+done+'/'+p.ch.length+' live</span></div>';
+  p.ch.forEach(c => {
+    const r = document.createElement('button');
+    r.className = 'toc-row';
+    r.innerHTML = '<span class="toc-rn">'+String(c.i).padStart(2,'0')+'</span><span>'+
+      '<span class="toc-rt">'+c.t+(c.live?'<span class="pill live">Published</span>':'<span class="pill soon">Planned</span>')+'</span>'+
+      '<p class="toc-rd">'+c.d+'</p></span>';
+    r.addEventListener('click', () => go(c.i));
+    wrap.appendChild(r);
+  });
+  toc.appendChild(wrap);
+});
+
+/* ---- navigation ---- */
+function show(id){
+  ['view-home','view-ch1','view-ch26','view-stub'].forEach(v => $(v).hidden = (v !== id));
+}
+
+function go(i){
+  const c = FLAT.find(x => x.i === i);
+  if(!c) return;
+  current = i;
+  if(c.live){ show('view-' + c.live); }
+  else {
+    $('stubMeta').textContent = c.part + ' · Chapter ' + c.i;
+    $('stubTitle').textContent = c.t;
+    $('stubDesc').textContent = 'This chapter will cover: ' + c.d;
+    show('view-stub');
+  }
+  document.querySelectorAll('.side-link').forEach(b =>
+    b.classList.toggle('on', Number(b.dataset.ch) === i));
+  buildPager(i);
+  try{ localStorage.setItem('pf-ch', String(i)); }catch(e){}
+  if(location.hash !== '#ch'+i) history.replaceState(null,'','#ch'+i);
+  window.scrollTo(0,0);
+  if(window.matchMedia('(max-width:900px)').matches) $('side').hidden = true;
+}
+
+function home(){
+  current = 'home';
+  show('view-home');
+  document.querySelectorAll('.side-link').forEach(b => b.classList.remove('on'));
+  pager.hidden = true;
+  window.scrollTo(0,0);
+}
+
+function buildPager(i){
+  const p = FLAT.find(x=>x.i===i-1), n = FLAT.find(x=>x.i===i+1);
+  pager.hidden = false;
+  pager.innerHTML = '';
+  const mk = (c, dir) => {
+    const b = document.createElement('button');
+    if(dir==='next') b.className = 'nx';
+    if(!c){ b.disabled = true; b.innerHTML = '<span>'+(dir==='next'?'End of book':'Start')+'</span>&nbsp;'; }
+    else{
+      b.innerHTML = '<span>'+(dir==='next'?'Next · chapter '+c.i:'Previous · chapter '+c.i)+'</span>'+c.t;
+      b.addEventListener('click', () => go(c.i));
+    }
+    return b;
+  };
+  pager.appendChild(mk(p,'prev'));
+  pager.appendChild(mk(n,'next'));
+}
+
+/* ---- controls ---- */
+$('brandBtn').addEventListener('click', home);
+$('startBtn').addEventListener('click', () => go(1));
+$('sampleBtn').addEventListener('click', () => go(26));
+$('menuBtn').addEventListener('click', () => { $('side').hidden = !$('side').hidden; });
+
+$('filter').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#nav .side-link').forEach(b => {
+    const c = FLAT.find(x => x.i === Number(b.dataset.ch));
+    b.hidden = q ? !((c.t + ' ' + c.d).toLowerCase().includes(q)) : false;
+  });
+  document.querySelectorAll('#nav .side-part').forEach(h => {
+    let s = h.nextElementSibling, any = false;
+    while(s && s.classList.contains('side-link')){ if(!s.hidden) any = true; s = s.nextElementSibling; }
+    h.hidden = !any;
+  });
+});
+
+/* ---- resume ---- */
+(function(){
+  let saved = null;
+  try{ saved = localStorage.getItem('pf-ch'); }catch(e){}
+  const c = saved && FLAT.find(x => x.i === Number(saved));
+  if(c){
+    $('resumeRow').hidden = false;
+    $('resumeBtn').textContent = 'Continue: chapter ' + c.i + ' — ' + c.t;
+    $('resumeBtn').addEventListener('click', () => go(c.i));
+  }
+})();
+
+/* ---- responsive sidebar default ---- */
+function syncSide(){ $('side').hidden = window.matchMedia('(max-width:900px)').matches; }
+syncSide();
+window.addEventListener('resize', syncSide);
+
+/* ---- progress ---- */
+$('prog').textContent = FLAT.filter(c=>c.live).length + ' of ' + FLAT.length + ' chapters published';
+
+/* ---- deep links: #ch7 opens chapter 7 ---- */
+function fromHash(){
+  const m = /^#ch(\d+)$/.exec(location.hash || '');
+  if(m && FLAT.some(c => c.i === Number(m[1]))) go(Number(m[1]));
+}
+window.addEventListener('hashchange', fromHash);
+fromHash();
+</script>
+
+</body>
+</html>

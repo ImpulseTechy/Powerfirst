@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Work out the right power supply topology and parts for your project. Shows every calculation, what it assumed, and what it did not check. Free.">
+<meta name="author" content="Yogesh Bawane">
+<meta name="theme-color" content="#EFF2EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1512" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://REPLACE-WITH-YOUR-DOMAIN/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EFF2EE'/%3E%3Cpath d='M2 11h8l2 13h2c3 0 4-13 6-13h10' stroke='%23A9531A' stroke-width='3' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Power First">
+<meta property="og:title" content="Power Supply Picker">
+<meta property="og:description" content="Work out the right power supply topology and parts for your project. Shows every calculation, what it assumed, and what it did not check. Free.">
+<meta property="og:url" content="https://REPLACE-WITH-YOUR-DOMAIN/">
+<meta property="og:image" content="https://REPLACE-WITH-YOUR-DOMAIN/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Power Supply Picker">
+<meta name="twitter:description" content="Work out the right power supply topology and parts for your project. Shows every calculation, what it assumed, and what it did not check. Free.">
+<meta name="twitter:image" content="https://REPLACE-WITH-YOUR-DOMAIN/og.png">
+<title>Power Supply Picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#EFF2EE; --surface:#FBFCFA; --surface-2:#E4EAE3;
+  --ink:#141C18; --ink-soft:#4A554E; --ink-faint:#77837B;
+  --rule:#CED6CC; --rule-soft:#DDE3DB;
+  --copper:#A9531A; --copper-deep:#7E3D12; --copper-wash:#F3E4D8;
+  /* status — validated light: PASS on all six checks */
+  --good:#067A5E;  --good-wash:#DCEDE7;
+  --warnx:#A87A00; --warnx-wash:#F4EBD3;
+  --bad:#A11E12;   --bad-wash:#F5E0DC;
+  --track:#D7E3DE;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1512; --surface:#161D19; --surface-2:#1E2721;
+  --ink:#E7ECE5; --ink-soft:#9DAAA1; --ink-faint:#7A867E;
+  --rule:#2B3830; --rule-soft:#232E28;
+  --copper:#E0904D; --copper-deep:#EDA664; --copper-wash:#2C2018;
+  --good:#2E9C82;  --good-wash:#12261F;
+  --warnx:#B39100; --warnx-wash:#241F0E;
+  --bad:#D2503A;   --bad-wash:#2A1713;
+  --track:#243029;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1512; --surface:#161D19; --surface-2:#1E2721;
+  --ink:#E7ECE5; --ink-soft:#9DAAA1; --ink-faint:#7A867E;
+  --rule:#2B3830; --rule-soft:#232E28;
+  --copper:#E0904D; --copper-deep:#EDA664; --copper-wash:#2C2018;
+  --good:#2E9C82;  --good-wash:#12261F;
+  --warnx:#B39100; --warnx-wash:#241F0E;
+  --bad:#D2503A;   --bad-wash:#2A1713;
+  --track:#243029;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+body{background:var(--bg); color:var(--ink); margin:0;
+  font-family:"Source Serif 4",Georgia,serif; font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1220px; margin:0 auto; padding:0 22px 90px}
+.sans{font-family:"Archivo",system-ui,sans-serif}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+header{border-bottom:2px solid var(--ink); padding:38px 0 22px; margin:0 0 26px}
+.kick{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  letter-spacing:.19em; text-transform:uppercase; color:var(--copper); margin:0 0 13px}
+h1{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(2.1rem,5vw,3.2rem);
+  line-height:1; letter-spacing:-.026em; margin:0 0 10px; text-wrap:balance}
+.sub{color:var(--ink-soft); max-width:64ch; margin:0 0 16px; font-size:1.05rem}
+.booklink{font-family:"Archivo",sans-serif; font-size:13.5px; font-weight:600;
+  color:var(--copper); text-decoration:none; border-bottom:1px solid var(--copper)}
+.booklink:focus-visible{outline:2px solid var(--copper); outline-offset:3px}
+
+.tabs{display:flex; border:1px solid var(--rule); border-radius:2px; overflow:hidden;
+  margin:0 0 24px; width:fit-content; max-width:100%; flex-wrap:wrap}
+.tab{font-family:"Archivo",sans-serif; font-weight:600; font-size:14px; padding:10px 20px;
+  background:var(--surface); color:var(--ink-soft); border:0; cursor:pointer;
+  border-right:1px solid var(--rule)}
+.tab:last-child{border-right:0}
+.tab.on{background:var(--ink); color:var(--bg)}
+.tab:focus-visible{outline:2px solid var(--copper); outline-offset:-3px}
+
+.cols{display:grid; grid-template-columns:minmax(310px,368px) minmax(0,1fr); gap:28px; align-items:start}
+@media (max-width:920px){.cols{grid-template-columns:minmax(0,1fr)}}
+
+.panel{border:1px solid var(--rule); background:var(--surface); padding:20px}
+.panel h2{font-family:"Archivo",sans-serif; font-weight:700; font-size:1.05rem;
+  letter-spacing:-.014em; margin:0 0 4px}
+.panel .hint{font-size:14px; color:var(--ink-faint); margin:0 0 18px}
+label{display:block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 5px}
+select,input[type=number]{width:100%; font-family:"IBM Plex Mono",monospace; font-size:14px;
+  padding:8px 10px; background:var(--bg); color:var(--ink); border:1px solid var(--rule); border-radius:2px}
+select:focus,input:focus{outline:2px solid var(--copper); outline-offset:1px}
+.field{margin:0 0 15px}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.unit{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--ink-faint);
+  text-transform:none; letter-spacing:0}
+.chk{display:flex; gap:9px; align-items:flex-start; margin:0 0 11px; cursor:pointer;
+  font-size:14.5px; color:var(--ink-soft)}
+.chk input{margin-top:4px; accent-color:var(--copper); flex:none}
+.chk span{line-height:1.45}
+
+.btn{font-family:"Archivo",sans-serif; font-weight:600; font-size:14px; padding:11px 22px;
+  border-radius:2px; cursor:pointer; border:1px solid var(--ink); background:var(--ink); color:var(--bg)}
+.btn:hover{background:var(--copper); border-color:var(--copper); color:#fff}
+.btn.ghost{background:none; color:var(--ink); border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--copper); color:var(--copper); background:none}
+.btn.sm{font-size:12.5px; padding:7px 14px}
+.btn:focus-visible{outline:2px solid var(--copper); outline-offset:3px}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; align-items:center}
+.btn.dirty{background:var(--copper); border-color:var(--copper); color:#fff}
+.dirty-hint{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--copper);
+  letter-spacing:.04em; flex-basis:100%; margin-top:-2px}
+
+/* load builder */
+.lib{display:grid; grid-template-columns:repeat(auto-fill,minmax(142px,1fr)); gap:7px; margin:0 0 18px}
+.lib button{text-align:left; background:var(--bg); border:1px solid var(--rule); border-radius:2px;
+  padding:8px 10px; cursor:pointer; color:var(--ink); font-family:inherit}
+.lib button:hover{border-color:var(--copper); color:var(--copper)}
+.lib button:focus-visible{outline:2px solid var(--copper); outline-offset:1px}
+.lib .ln{display:block; font-family:"Archivo",sans-serif; font-weight:600; font-size:12.5px;
+  line-height:1.25; letter-spacing:-.005em; margin-bottom:3px}
+.lib .lv{display:block; font-family:"IBM Plex Mono",monospace; font-size:9.5px; color:var(--ink-faint)}
+.added{border:1px solid var(--rule); margin:0 0 14px}
+.arow{display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center;
+  padding:9px 12px; border-bottom:1px solid var(--rule-soft)}
+.arow:last-child{border-bottom:0}
+.arow .an{font-family:"Archivo",sans-serif; font-weight:600; font-size:13.5px}
+.arow .aq{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-faint)}
+.arow button{background:none; border:1px solid var(--rule); color:var(--ink-faint);
+  font-family:"IBM Plex Mono",monospace; font-size:12px; width:24px; height:24px;
+  cursor:pointer; border-radius:2px; line-height:1}
+.arow button:hover{border-color:var(--bad); color:var(--bad)}
+.empty{padding:20px; text-align:center; color:var(--ink-faint); font-size:14px;
+  border:1px dashed var(--rule); margin:0 0 14px}
+.rail{display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center;
+  border:1px solid var(--rule); background:var(--bg); padding:11px 13px; margin:0 0 8px}
+.rail .rv{font-family:"Archivo",sans-serif; font-weight:700; font-size:16px}
+.rail .rd{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-faint); margin-top:3px; line-height:1.5}
+
+/* ===== RESULTS ===== */
+.verdict{border:1px solid var(--copper); border-top:4px solid var(--copper);
+  background:var(--copper-wash); padding:24px 26px; margin:0 0 18px}
+.v-lab{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--copper-deep); margin:0 0 10px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.v-top{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(1.45rem,3.1vw,2rem);
+  line-height:1.06; letter-spacing:-.022em; margin:0 0 7px; text-wrap:balance}
+.v-part{font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:600;
+  color:var(--copper-deep); margin:0 0 14px}
+.verdict p{margin:0 0 11px} .verdict p:last-child{margin-bottom:0}
+.v-plain{font-size:1.06rem}
+
+.chip{display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Mono",monospace;
+  font-size:9.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  padding:3px 9px; border-radius:2px; border:1px solid; white-space:nowrap}
+.chip.good{color:var(--good); background:var(--good-wash); border-color:var(--good)}
+.chip.warnx{color:var(--warnx); background:var(--warnx-wash); border-color:var(--warnx)}
+.chip.bad{color:var(--bad); background:var(--bad-wash); border-color:var(--bad)}
+.chip.neutral{color:var(--ink-faint); background:var(--surface-2); border-color:var(--rule)}
+.dotm{width:7px; height:7px; border-radius:50%; background:currentColor; flex:none}
+
+/* stat tiles */
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin:0 0 20px}
+.tile{background:var(--surface); padding:14px 16px}
+.tile .tl{font-size:13px; color:var(--ink-faint); margin:0 0 5px; line-height:1.3}
+.tile .tv{font-family:"Archivo",sans-serif; font-weight:600; font-size:1.6rem;
+  line-height:1.05; letter-spacing:-.02em; margin:0}
+.tile .tn{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-faint); margin:4px 0 0}
+
+/* meter */
+.meter-wrap{border:1px solid var(--rule); background:var(--surface); padding:18px 20px; margin:0 0 20px}
+.meter-head{display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+  flex-wrap:wrap; margin:0 0 13px}
+.meter-title{font-family:"Archivo",sans-serif; font-weight:600; font-size:15px; letter-spacing:-.01em}
+.meter-val{font-family:"Archivo",sans-serif; font-weight:600; font-size:1.5rem; letter-spacing:-.02em}
+.track{position:relative; height:16px; background:var(--track); border-radius:2px; overflow:hidden}
+.fill{position:absolute; left:0; top:0; bottom:0; border-radius:2px 0 0 2px}
+.fill.good{background:var(--good)} .fill.warnx{background:var(--warnx)} .fill.bad{background:var(--bad)}
+.ticks{position:relative; height:20px; margin-top:5px}
+.tk{position:absolute; transform:translateX(-50%); font-family:"IBM Plex Mono",monospace;
+  font-size:10px; color:var(--ink-faint); white-space:nowrap; text-align:center}
+.tk::before{content:''; display:block; width:1px; height:5px; background:var(--rule); margin:0 auto 2px}
+.lib{min-width:0} .lib button{min-width:0; overflow-wrap:anywhere}
+select,input{min-width:0; max-width:100%}
+.meter-note{font-size:14px; color:var(--ink-soft); margin:12px 0 0}
+
+/* details */
+details{border:1px solid var(--rule); background:var(--surface); margin:0 0 14px}
+summary{font-family:"Archivo",sans-serif; font-weight:600; font-size:14.5px; padding:13px 18px;
+  cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+'; font-family:"IBM Plex Mono",monospace; font-size:16px; color:var(--copper)}
+details[open] summary::after{content:'−'}
+summary:hover{color:var(--copper)}
+summary:focus-visible{outline:2px solid var(--copper); outline-offset:-3px}
+.dbody{padding:0 18px 18px; border-top:1px solid var(--rule-soft)}
+.dbody > :first-child{margin-top:16px}
+.sm-note{font-size:13.5px; color:var(--ink-faint); font-weight:400; font-family:"Source Serif 4",serif}
+
+h3{font-family:"Archivo",sans-serif; font-weight:700; font-size:1.08rem;
+  letter-spacing:-.015em; margin:24px 0 11px}
+.eq{font-family:"IBM Plex Mono",monospace; font-size:13.5px; font-weight:500;
+  background:var(--surface-2); border-left:3px solid var(--copper);
+  padding:11px 15px; margin:0 0 14px; overflow-x:auto; line-height:1.85}
+.eq b{color:var(--copper); font-weight:600}
+.scroll{overflow-x:auto; border:1px solid var(--rule); background:var(--surface); margin:0 0 16px}
+table{border-collapse:collapse; width:100%; min-width:480px; font-size:14px}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+th{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink-faint); background:var(--surface-2);
+  border-bottom:1px solid var(--rule); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+td.pn{font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:500}
+tr.tot td{border-top:1.5px solid var(--rule); font-weight:600; background:var(--surface-2)}
+
+.note{border:1px solid var(--rule); background:var(--surface); padding:15px 17px; margin:0 0 14px}
+.note.bad{border-color:var(--bad); background:var(--bad-wash)}
+.note.warnx{border-color:var(--warnx); background:var(--warnx-wash)}
+.note.good{border-color:var(--good); background:var(--good-wash)}
+.note-t{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; margin:0 0 7px; color:var(--ink-faint)}
+.note.bad .note-t{color:var(--bad)} .note.warnx .note-t{color:var(--warnx)} .note.good .note-t{color:var(--good)}
+.note p{margin:0 0 8px; font-size:15px} .note p:last-child{margin-bottom:0}
+.note ul{margin:0; padding-left:1.1em; font-size:14.5px} .note li{margin:0 0 5px}
+.note li::marker{color:var(--ink-faint)}
+
+.ref{display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600;
+  color:var(--copper); text-decoration:none; border-bottom:1px dotted var(--copper); white-space:nowrap}
+.ref:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+.assume{font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.85; color:var(--ink-soft)}
+.assume b{color:var(--ink); font-weight:600}
+/* ideas section */
+#ideas{margin-top:64px; padding-top:34px; border-top:2px solid var(--ink); scroll-margin-top:20px}
+.ideas-h{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(1.5rem,3.4vw,2.1rem);
+  line-height:1.06; letter-spacing:-.022em; margin:0 0 8px}
+.ideas-sub{color:var(--ink-soft); max-width:60ch; margin:0 0 26px; font-size:1.02rem}
+.ideas{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule)}
+.idea{background:var(--surface); padding:20px 22px; scroll-margin-top:14px}
+.idea h3{font-family:"Archivo",sans-serif; font-weight:700; font-size:1.02rem;
+  letter-spacing:-.013em; margin:0 0 9px; text-wrap:balance}
+.idea p{font-size:15px; line-height:1.62; margin:0 0 10px}
+.idea p:last-child{margin-bottom:0}
+.idea code{background:var(--surface-2); padding:1px 5px; border-radius:2px;
+  font-family:"IBM Plex Mono",monospace; font-size:.86em}
+.idea:target{background:var(--copper-wash); box-shadow:inset 3px 0 0 var(--copper)}
+
+/* credit */
+.credit{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+  gap:20px 28px; margin-top:56px; padding-top:26px; border-top:2px solid var(--ink)}
+.credit-by{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 5px}
+.credit-name{font-family:"Archivo",sans-serif; font-weight:700; font-size:1.35rem;
+  letter-spacing:-.02em; line-height:1; margin:0 0 7px}
+.credit-line{font-size:15px; color:var(--ink-soft); margin:0; max-width:44ch}
+.credit-links{display:flex; flex-wrap:wrap; gap:8px}
+.credit-links a{font-family:"Archivo",sans-serif; font-weight:600; font-size:13.5px;
+  color:var(--ink); text-decoration:none; border:1px solid var(--rule);
+  padding:8px 16px; border-radius:2px; background:var(--surface)}
+.credit-links a:hover{border-color:var(--copper); color:var(--copper)}
+.credit-links a:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+
+.foot{margin-top:26px; padding-top:20px; border-top:1px solid var(--rule);
+  font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.75; color:var(--ink-faint)}
+.tick{color:var(--good); font-weight:600}
+
+@media (max-width:560px){
+  .wrap{padding:0 16px 70px}
+  .tabs{width:100%; display:grid; grid-template-columns:1fr 1fr}
+  .tab{border-right:1px solid var(--rule); text-align:center; padding:11px 8px}
+  .tab:last-child{border-right:0}
+  .pair{grid-template-columns:1fr; gap:0}
+  .verdict{padding:20px 18px}
+  .panel{padding:17px}
+  .tiles{grid-template-columns:1fr 1fr}
+  .credit{gap:16px}
+  .credit-links{width:100%}
+  .credit-links a{flex:1; text-align:center; padding:9px 10px}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header>
+  <p class="kick">Free tool &middot; for students and makers</p>
+  <h1>Power Supply Picker</h1>
+  <p class="sub">Tell it what your project needs. It gives you a plain answer first, then shows every calculation behind it, what it assumed, and what it did not check.</p>
+  <a class="booklink" href="#ideas">The ideas behind the answers &darr;</a>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab on" id="tabSpec" role="tab">I know my numbers</button>
+  <button class="tab" id="tabLoad" role="tab">Help me work them out</button>
+</div>
+
+<div class="cols">
+  <div>
+    <div class="panel" id="panelLoad" hidden>
+      <h2>What are you powering?</h2>
+      <p class="hint">Add everything in your project. Motors and servos are assumed to move together; radios are assumed to transmit one at a time.</p>
+      <div class="lib" id="lib"></div>
+      <div id="addedWrap"></div>
+      <h2 style="margin-top:20px">Rails you need</h2>
+      <p class="hint">Pick one to design. Come back for the others.</p>
+      <div id="rails"></div>
+    </div>
+
+    <div class="panel" id="panelSpec">
+      <h2>Your specification</h2>
+      <p class="hint">Change anything and the answer updates.</p>
+      <div class="field"><label for="src">Where the power comes from</label><select id="src"></select></div>
+      <div class="pair">
+        <div class="field"><label for="vmin">V<sub>in</sub> minimum <span class="unit">V</span></label><input type="number" id="vmin" step="0.1"></div>
+        <div class="field"><label for="vmax">V<sub>in</sub> maximum <span class="unit">V</span></label><input type="number" id="vmax" step="0.1"></div>
+      </div>
+      <div class="field"><label for="vout">Output voltage <span class="unit">V</span></label><input type="number" id="vout" step="0.1" value="5"></div>
+      <div class="pair">
+        <div class="field"><label for="iavg">Average current <span class="unit">mA</span></label><input type="number" id="iavg" step="10" value="1000"></div>
+        <div class="field"><label for="ipeak">Peak current <span class="unit">mA</span></label><input type="number" id="ipeak" step="10" value="1200"></div>
+      </div>
+      <div class="pair">
+        <div class="field"><label for="tburst">Peak lasts <span class="unit">µs</span></label><input type="number" id="tburst" step="10" value="1000"></div>
+        <div class="field"><label for="tamb">Ambient temp <span class="unit">°C</span></label><input type="number" id="tamb" step="1" value="35"></div>
+      </div>
+      <label style="margin-bottom:9px">Options</label>
+      <label class="chk"><input type="checkbox" id="noisy"><span>This rail feeds analog, ADC or RF &mdash; it must be quiet</span></label>
+      <label class="chk"><input type="checkbox" id="hsOk"><span>I&rsquo;ll fit a heatsink <span class="unit">(assumed 12&nbsp;°C/W clip-on)</span></span></label>
+      <div class="field" id="runtimeField" hidden style="margin-top:6px">
+        <label for="runtime">Runtime wanted <span class="unit">hours</span></label><input type="number" id="runtime" step="0.5" value="8">
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="calcBtn">Work it out</button>
+        <button class="btn ghost sm" id="shareBtn">Copy link</button>
+        <span class="dirty-hint" id="dirtyHint" hidden>Inputs changed — press Work it out</span>
+      </div>
+    </div>
+  </div>
+  <div id="out"></div>
+</div>
+
+<section id="ideas">
+  <h2 class="ideas-h">The ideas behind the answers</h2>
+  <p class="ideas-sub">Sixteen things that decide whether a power supply works. Every result above links down to the one it depends on.</p>
+
+  <div class="ideas">
+    <article class="idea" id="i-heat">
+      <h3>The heat equation</h3>
+      <p>A linear regulator does not remove the extra voltage &mdash; it burns it. <code>P = (V<sub>in</sub> − V<sub>out</sub>) × I</code>, every watt turning into heat inside one small package.</p>
+      <p>How hot that gets depends on thermal resistance, in °C per watt. A bare TO-220 in still air is about <strong>65 °C/W</strong>. So one watt is already a 65 °C rise, and on a 35 °C day that is a junction at 100 °C. <strong>That is where the rule of thumb comes from: about one watt is all a bare TO-220 can take.</strong> Above that you need a heatsink, or you need to stop using a linear regulator.</p>
+    </article>
+
+    <article class="idea" id="i-derate">
+      <h3>Why a &ldquo;1 A&rdquo; part is not a 1 A part</h3>
+      <p>The current on the front of a datasheet is what the silicon can pass, not what the package can cool. Those are different limits and the smaller one wins.</p>
+      <p>An AMS1117 is sold as 1 A. Its own datasheet gives 90 °C/W for the SOT-223 package. Dropping 5 V to 3.3 V at 35 °C ambient, the arithmetic gives you about <strong>425 mA</strong> before the junction passes 100 °C. The part was never lying. The heat sum just never got done.</p>
+    </article>
+
+    <article class="idea" id="i-dropout">
+      <h3>Dropout and headroom</h3>
+      <p>Every linear regulator needs the input to sit some minimum above the output. Below that it stops regulating and the output simply follows the input down.</p>
+      <p>A 7805 needs about 2 V, so it wants 7 V in for 5 V out. An AMS1117 needs 1.1&ndash;1.3 V. That is why <strong>an AMS1117 cannot make 3.3 V from a Li-ion cell</strong> &mdash; a cell at 3.7 V has only 0.4 V of headroom. It works on the bench from 5 V and fails on the battery, which is exactly the kind of failure that gets blamed on code.</p>
+    </article>
+
+    <article class="idea" id="i-iq">
+      <h3>Quiescent current</h3>
+      <p>A regulator draws current simply to stay switched on, whether or not anything is using it. On mains this is irrelevant. On a battery that sleeps between readings, it is often the largest load in the circuit.</p>
+      <p>A 7805 draws around 5 mA doing nothing. Over a month that is roughly <strong>3,600 mAh</strong> &mdash; more than most packs hold. An MCP1700 draws 1.6 µA, about three thousand times less. If your project sleeps, this number matters more than efficiency.</p>
+    </article>
+
+    <article class="idea" id="i-esr">
+      <h3>ESR &mdash; why capacitance is not the whole story</h3>
+      <p>Every capacitor has a small resistance in series with it. Current through it makes a voltage drop, instantly, before the capacitor has released any charge at all.</p>
+      <p>A generic 1000 µF electrolytic sits around 0.15 Ω. Pull 2 A and you lose <strong>300 mV immediately</strong>. If your whole droop budget was 350 mV, you have spent it on a parasitic and the capacitance never got a chance. Two parts both marked 10 µF can behave completely differently. Buy low-ESR, or put several in parallel.</p>
+    </article>
+
+    <article class="idea" id="i-burst">
+      <h3>Bursts: the regulator supplies the average, the capacitor supplies the burst</h3>
+      <p>Radios, motors and cellular modules do not draw steady current &mdash; they spike. A GSM module pulls 2 A for 577 µs, over and over, while averaging nearer 300 mA.</p>
+      <p>A regulator's control loop takes tens of microseconds to react, so during a short burst it barely helps. The charge comes from a capacitor sitting next to the load: <code>ΔV = (I<sub>peak</sub> − I<sub>reg</sub>) × t ÷ C + I<sub>peak</sub> × ESR</code>. <strong>You do not need a supply rated for the peak. You need a capacitor that can cover it</strong> &mdash; and it belongs beside the load, not beside the battery.</p>
+    </article>
+
+    <article class="idea" id="i-rint">
+      <h3>Cell resistance decides your peak current</h3>
+      <p>Capacity tells you how long something runs. Internal resistance tells you whether it runs at all. <code>V<sub>sag</sub> = I<sub>peak</sub> × R<sub>internal</sub></code>.</p>
+      <p>Two amps through a good 18650 at 80 mΩ costs 160 mV &mdash; fine. The same 2 A through a CR2032 coin cell, which sits around 10&ndash;15 Ω, collapses it entirely. That is why an ESP32 on a coin cell resets the instant WiFi transmits. <strong>For pulsed loads, choose cells by resistance, not by mAh.</strong> A high-drain 18650 or an RC LiPo, not the cheapest cell on the shelf.</p>
+    </article>
+
+    <article class="idea" id="i-boost">
+      <h3>A boost converter draws more current than it delivers</h3>
+      <p>Power in must exceed power out. So when a boost raises voltage, it lowers current on the way in &mdash; meaning the input current is <em>higher</em> than the output current, not lower.</p>
+      <p>5 V at 2 A is 10 W. From a 3.5 V cell at 90% efficiency, that needs about <strong>3.2 A from the battery.</strong> Size the cell, the wiring and the fuse for that number. This single misunderstanding is why so many cheap boost modules disappoint: their headline rating is switch current, not output current.</p>
+    </article>
+
+    <article class="idea" id="i-cross">
+      <h3>When the input crosses the output</h3>
+      <p>A buck only steps down. A boost only steps up. A 1S Li-ion runs from 4.2 V down to 3.0 V, so a 3.3 V rail from that cell needs both &mdash; buck at the start of the discharge, boost at the end.</p>
+      <p>That is what a buck-boost or SEPIC is for. But check first whether you need a regulator at all: <strong>if your load accepts a voltage range that contains the battery's range, connect it directly.</strong> Cellular modules want 3.4&ndash;4.2 V, almost exactly a Li-ion cell. No conversion means no loss, no switching noise and fewer parts.</p>
+    </article>
+
+    <article class="idea" id="i-series">
+      <h3>Cells in series, and why 1S is the easy case</h3>
+      <p>S counts cells in series and adds voltage: 1S Li-ion is 3.0&ndash;4.2 V, 2S is 6.0&ndash;8.4 V, 3S is 9.0&ndash;12.6 V. P counts cells in parallel and adds capacity and peak current.</p>
+      <p>Everything gets harder past 1S, because cells in series drift apart. <strong>One cell creeping high overcharges, which is a fire. One creeping low is a dead pack.</strong> So 1S needs nothing but a charger, while 2S and above needs a BMS that balances and a charger matched to the cell count.</p>
+    </article>
+
+    <article class="idea" id="i-charge">
+      <h3>Charging, and charging while running</h3>
+      <p>Lithium cells charge at constant current until they reach their termination voltage, then hold that voltage while current tapers off. Stop at the wrong voltage and you either undercharge or damage the cell.</p>
+      <p>A TP4056 terminates at 4.2 V, correct for Li-ion. <strong>LiFePO4 must stop at 3.65 V</strong> &mdash; put a TP4056 on one and you overcharge it every cycle. And a plain TP4056 charges only: the load cannot run properly off the cell at the same time. Running while charging needs a power-path charger, which is a different part.</p>
+    </article>
+
+    <article class="idea" id="i-simul">
+      <h3>Simultaneity &mdash; what actually peaks together</h3>
+      <p>Adding up every datasheet maximum gives a supply two or three times bigger than you need. Assuming only one thing peaks at a time can give you one that is half the size it should be.</p>
+      <p>The useful split is by behaviour. <strong>Motors and servos move together</strong> &mdash; four servos in an arm all draw at once, so sum their peaks. <strong>Radios transmit independently</strong>, so count one peak plus everything else's average. Three MG996R servos is a 7.5 A peak, not 3.5 A, and that difference is the whole design.</p>
+    </article>
+
+    <article class="idea" id="i-stability">
+      <h3>LDO stability and the output capacitor</h3>
+      <p>An LDO is a feedback loop, and its output capacitor is part of that loop. Fit the wrong one and it oscillates &mdash; a supply that measures fine on a multimeter while ringing at hundreds of kilohertz.</p>
+      <p>Older LDOs need a minimum ESR and go unstable with a pure ceramic. Newer ones want the opposite. <strong>The datasheet states which capacitor type and value range it was designed for, and it is not a suggestion.</strong> This is one thing no calculator can check for you.</p>
+    </article>
+
+    <article class="idea" id="i-wiring">
+      <h3>Wiring it, even on perfboard</h3>
+      <p>The circuit that works is not the schematic &mdash; it is the schematic plus every wire's resistance and inductance. On perfboard, a few rules cover most of it.</p>
+      <p>Keep the high-current loop short and fat: 20 AWG, not jumper wire. Put bulk capacitance <strong>beside the load, not beside the battery</strong>. Ceramics closest to the pin, electrolytic behind them &mdash; small and fast in front, big and slow behind. Star ground at the source, so a motor's return current never travels through your microcontroller's ground.</p>
+    </article>
+
+    <article class="idea" id="i-measure">
+      <h3>Why a multimeter is not enough</h3>
+      <p>A multimeter samples a few times a second and reports an average. The failures that matter last microseconds.</p>
+      <p>A 3.3 V rail collapsing to 2.6 V for 200 µs, two hundred times a second, still reads <strong>3.29 V</strong> on a meter &mdash; which looks perfect. The chip resets anyway and you go hunting through your code. The meter is not lying; it is answering a different question. <strong>To know whether a supply works, put a scope on it</strong>, AC coupled with a short ground spring, and trigger on the falling edge.</p>
+    </article>
+
+    <article class="idea" id="i-mains">
+      <h3>Mains &mdash; the one place to be conservative</h3>
+      <p>230 V will kill you, and perfboard has neither the creepage distance nor the mechanical protection to be safe with it. <strong>Never build a non-isolated mains circuit on perfboard.</strong></p>
+      <p>There are four ways to get DC from mains, and for almost everyone the first is right: a certified adapter. Then a potted isolated module such as a Hi-Link. Then an offline switcher IC, if you want to build and understand it. The transformer-bridge-capacitor-7805 circuit from old textbooks is there to teach rectification and ripple &mdash; it is not a recommendation.</p>
+    </article>
+  </div>
+</section>
+
+<footer class="credit">
+  <div class="credit-who">
+    <p class="credit-by">Built by</p>
+    <p class="credit-name">Yogesh Bawane</p>
+  </div>
+  <nav class="credit-links" aria-label="Impulse Tech elsewhere">
+    <a href="https://www.youtube.com/@ImpulseTech" target="_blank" rel="noopener">YouTube</a>
+    <a href="https://www.instagram.com/impulsetechy/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.linkedin.com/in/yogesh-bawane/" target="_blank" rel="noopener">LinkedIn</a>
+  </nav>
+</footer>
+
+<p class="foot">
+  <span class="tick">✓</span> beside a price means it was checked on Robu.in or Ktron.in. Others are typical street prices &mdash; verify before ordering.<br>
+  Efficiency and thermal models are derived from manufacturer datasheets and stated in full under &ldquo;What this assumed&rdquo;. They are models, not measurements.<br>
+  This tool is a starting point. The datasheet is the final authority, and the scope is the final proof.
+</p>
+</div>
+
+<script>
+const TJ_MAX = 125, TJ_TARGET = 100, HS_TJA = 12;
+
+const SOURCES = {
+  custom:   {l:"Custom / other",       min:12,  max:12,   nom:12,   bat:0},
+  usb:      {l:"USB 5 V",              min:4.75,max:5.25, nom:5,    bat:0},
+  adapter9: {l:"9 V adapter",          min:8.5, max:9.5,  nom:9,    bat:0},
+  adapter12:{l:"12 V adapter",         min:11.4,max:12.6, nom:12,   bat:0},
+  adapter24:{l:"24 V adapter",         min:22.8,max:25.2, nom:24,   bat:0},
+  li1s:     {l:"1S Li-ion / LiPo",     min:3.0, max:4.2,  nom:3.7,  bat:1, r:0.08},
+  li2s:     {l:"2S Li-ion / LiPo",     min:6.0, max:8.4,  nom:7.4,  bat:1, r:0.16},
+  li3s:     {l:"3S Li-ion / LiPo",     min:9.0, max:12.6, nom:11.1, bat:1, r:0.24},
+  li4s:     {l:"4S Li-ion / LiPo",     min:12.0,max:16.8, nom:14.8, bat:1, r:0.32},
+  lfp4s:    {l:"4S LiFePO4",           min:10.0,max:14.6, nom:12.8, bat:1, r:0.24},
+  sla12:    {l:"12 V lead-acid (SLA)", min:10.5,max:13.8, nom:12.0, bat:1, r:0.05},
+  aa4:      {l:"4 × AA alkaline",      min:3.6, max:6.4,  nom:5.2,  bat:1, r:0.6},
+  pp3:      {l:"9 V PP3 block",        min:6.5, max:9.0,  nom:8.0,  bat:1, r:1.7},
+  mains:    {l:"230 V AC mains",       min:0,   max:0,    nom:0,    bat:0, mains:1}
+};
+
+/* kind: motor (peak together) · radio (one at a time) · logic (steady) */
+const LOADS = [
+ {id:"esp32",  n:"ESP32 module",       v:3.3,a:80, p:500, t:5000,  k:"radio"},
+ {id:"esp8266",n:"ESP8266 / NodeMCU",  v:3.3,a:80, p:430, t:5000,  k:"radio"},
+ {id:"uno",    n:"Arduino Uno / Nano", v:5,  a:45, p:70,  t:0,     k:"logic"},
+ {id:"pizero", n:"Pi Zero 2 W",        v:5,  a:400,p:1000,t:20000, k:"radio"},
+ {id:"sim800", n:"SIM800L (2G)",       v:4.0,a:300,p:2000,t:577,   k:"radio"},
+ {id:"lte",    n:"SIM7670 / A7670",    v:3.8,a:300,p:2000,t:577,   k:"radio"},
+ {id:"gps",    n:"NEO-6M GPS",         v:3.3,a:45, p:70,  t:0,     k:"logic"},
+ {id:"nrf",    n:"nRF24L01+PA",        v:3.3,a:15, p:120, t:1000,  k:"radio"},
+ {id:"bt",     n:"HC-05 Bluetooth",    v:3.3,a:30, p:40,  t:0,     k:"logic"},
+ {id:"oled",   n:"OLED 0.96\"",        v:3.3,a:20, p:25,  t:0,     k:"logic"},
+ {id:"lcd",    n:"16×2 LCD + light",   v:5,  a:25, p:30,  t:0,     k:"logic"},
+ {id:"sd",     n:"SD card module",     v:3.3,a:20, p:100, t:2000,  k:"logic"},
+ {id:"sens",   n:"I²C sensor",         v:3.3,a:1,  p:5,   t:0,     k:"logic"},
+ {id:"analog", n:"Analog / ADC stage", v:3.3,a:10, p:15,  t:0,     k:"logic", q:1},
+ {id:"sg90",   n:"SG90 micro servo",   v:5,  a:200,p:700, t:200000,k:"motor"},
+ {id:"mg996",  n:"MG996R servo",       v:6,  a:500,p:2500,t:200000,k:"motor"},
+ {id:"n20",    n:"N20 gear motor",     v:6,  a:150,p:800, t:100000,k:"motor"},
+ {id:"tt",     n:"TT gear motor",      v:6,  a:200,p:1000,t:100000,k:"motor"},
+ {id:"nema17", n:"NEMA17 + driver",    v:12, a:600,p:1400,t:50000, k:"motor"},
+ {id:"relay",  n:"5 V relay module",   v:5,  a:70, p:90,  t:0,     k:"logic"},
+ {id:"ws2812", n:"WS2812B LED (each)", v:5,  a:20, p:60,  t:0,     k:"logic"},
+ {id:"buzz",   n:"Active buzzer",      v:5,  a:30, p:40,  t:0,     k:"logic"}
+];
+
+/* ty: lin ldo buck boost bb acdc · tja = °C/W in still air · k = fixed loss overhead (V)
+   irated = headline rating · iq = quiescent current (A) */
+const PARTS = [
+ {id:"7805", n:"7805 (TO-220)",       ty:"lin", vf:5,         irated:1.0, vin:[7,35],   drop:2.0,  iq:5e-3,  tja:65, hs:1, rs:15,  ok:0, note:"bulletproof, forgiving, thermally hungry"},
+ {id:"317",  n:"LM317 (TO-220)",      ty:"lin", vf:[1.25,30], irated:1.5, vin:[4.25,40],drop:3.0,  iq:5e-3,  tja:65, hs:1, rs:15,  ok:0, note:"the adjustable version of the same idea"},
+ {id:"ams",  n:"AMS1117 module",      ty:"ldo", vf:[3.3,5],   irated:1.0, vin:[4.5,15], drop:1.3,  iq:5e-3,  tja:90, hs:0, rs:15,  ok:1, note:"sold as 1 A; the datasheet's own 90 °C/W says otherwise"},
+ {id:"mcp",  n:"MCP1700-3302E",       ty:"ldo", vf:3.3,       irated:0.25,vin:[3.5,6],  drop:0.178,iq:1.6e-6,tja:180,hs:0, rs:35,  ok:0, note:"1.6 µA quiescent — the sleeping-node part"},
+ {id:"mic",  n:"MIC29302 (TO-263)",   ty:"ldo", vf:[1.24,26], irated:3.0, vin:[2.3,26], drop:0.35, iq:12e-3, tja:50, hs:1, rs:120, ok:0, note:"low dropout at real current; SIMCom's own reference"},
+ {id:"2596", n:"LM2596 module",       ty:"buck",vf:[1.5,35],  irated:3.0, vin:[4.5,40], drop:1.5,  iq:8e-3,  tja:50, hs:1, rs:44,  ok:1, kk:1.25, note:"the default cheap buck; 150 kHz, non-synchronous"},
+ {id:"1584", n:"MP1584EN module",     ty:"buck",vf:[1,20],    irated:3.0, vin:[4.5,28], drop:1.0,  iq:0.1e-3,tja:60, hs:0, rs:105, ok:1, kk:0.70, note:"smaller and more efficient than the LM2596"},
+ {id:"4015", n:"XL4015 module",       ty:"buck",vf:[1.25,32], irated:5.0, vin:[8,36],   drop:1.5,  iq:3e-3,  tja:35, hs:0, rs:99,  ok:1, kk:0.90, note:"5 A with its own heatsink — for motors"},
+ {id:"3606", n:"XY-3606 module",      ty:"buck",vf:5,         irated:5.0, vin:[8,26],   drop:1.5,  iq:3e-3,  tja:35, hs:0, rs:125, ok:1, kk:0.70, note:"fixed 5 V at 5 A, ready to wire"},
+ {id:"1308", n:"SX1308 module",       ty:"boost",vf:[3,24],   irated:1.0, vin:[2,24],   iq:2e-3,   tja:90, hs:0, rs:30,  ok:1, kk:0.60, note:"the 2 A on the listing is switch current, not output"},
+ {id:"b150", n:"150 W boost module",  ty:"boost",vf:[12,35],  irated:6.0, vin:[10,32],  iq:5e-3,   tja:20, hs:0, rs:131, ok:1, kk:0.80, note:"heatsinked, for real power"},
+ {id:"63020",n:"TPS63020 board",      ty:"bb",  vf:[1.2,5.5], irated:2.0, vin:[1.8,5.5],iq:25e-6,  tja:45, hs:0, rs:250, ok:0, kk:0.45, note:"true buck-boost — survives Vin crossing Vout"},
+ {id:"pm01", n:"Hi-Link HLK-PM01",    ty:"acdc",vf:5,  irated:0.6, rs:215, ok:1, note:"isolated, potted, mains in"},
+ {id:"10m05",n:"Hi-Link HLK-10M05",   ty:"acdc",vf:5,  irated:2.0, rs:270, ok:1, note:"same idea at 10 W"},
+ {id:"5m12", n:"Hi-Link HLK-5M12",    ty:"acdc",vf:12, irated:0.45,rs:241, ok:1, note:"12 V version"},
+ {id:"ad12", n:"12 V 2 A adapter (BIS)",ty:"acdc",vf:12,irated:2.0,rs:183, ok:1, note:"certified — the safest answer for most people"}
+];
+
+const $ = id => document.getElementById(id);
+const f = (x,d=2) => (Number(x).toFixed(d).replace(/\.?0+$/,'') || '0');
+const rup = x => '₹' + (x>=100 ? Math.round(x) : (Math.round(x*100)/100));
+const tk = p => p.ok ? ' <span class="tick">✓</span>' : '';
+const outR = p => Array.isArray(p.vf) ? p.vf : [p.vf,p.vf];
+const makes = (p,v) => v >= outR(p)[0]-0.01 && v <= outR(p)[1]+0.01;
+const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
+
+/* efficiency model — fitted to the TI LM2596 datasheet:
+   73% @3.3V, 80% @5V, 90% @12V out, all 3 A → η ≈ Vout/(Vout+1.25) */
+function eff(p, vin, vout, iout){
+  const kk = p.kk || 1.0;
+  let e = (p.ty==='boost') ? vin/(vin+kk) : vout/(vout+kk);
+  const frac = iout / p.irated;
+  if(frac < 0.20) e *= (0.80 + frac);
+  const d = (p.ty==='boost') ? vin/vout : vout/vin;
+  if(d < 0.20) e *= 0.94; else if(d < 0.35) e *= 0.97;
+  return clamp(e, 0.35, 0.96);
+}
+function tja(p, hsOk){ return (hsOk && p.hs) ? HS_TJA : p.tja; }
+function linLimit(vdrop, th, tamb){ return Math.max(0,(TJ_TARGET - tamb)/(th*vdrop)); }
+function sevOf(tj){ return tj < 85 ? 'good' : tj <= TJ_TARGET ? 'warnx' : 'bad'; }
+function sevWord(tj){ return tj < 85 ? 'Comfortable' : tj <= TJ_TARGET ? 'Getting warm' : tj <= TJ_MAX ? 'Too hot' : 'Will not survive'; }
+
+/* ---------- inputs ---------- */
+const srcSel = $('src');
+Object.entries(SOURCES).forEach(([k,s])=>{const o=document.createElement('option');o.value=k;o.textContent=s.l;srcSel.appendChild(o);});
+srcSel.value = 'adapter12';
+function applySource(){
+  const s = SOURCES[srcSel.value];
+  if(!s.mains && srcSel.value!=='custom'){ $('vmin').value=s.min; $('vmax').value=s.max; }
+  $('vmin').disabled = !!s.mains; $('vmax').disabled = !!s.mains;
+  $('runtimeField').hidden = !s.bat;
+}
+srcSel.addEventListener('change', ()=>{applySource();markDirty();}); applySource();
+
+function markDirty(){ $('calcBtn').classList.add('dirty'); $('calcBtn').textContent='Update result'; $('dirtyHint').hidden=false; }
+function clearDirty(){ $('calcBtn').classList.remove('dirty'); $('calcBtn').textContent='Work it out'; $('dirtyHint').hidden=true; }
+
+let cart = {};
+LOADS.forEach(l=>{
+  const b=document.createElement('button');
+  b.innerHTML='<span class="ln">'+l.n+'</span><span class="lv">'+l.v+' V · '+l.a+' mA</span>';
+  b.addEventListener('click',()=>{cart[l.id]=(cart[l.id]||0)+1;renderCart();});
+  $('lib').appendChild(b);
+});
+function renderCart(){
+  const wrap=$('addedWrap'), rails=$('rails');
+  const ids=Object.keys(cart).filter(k=>cart[k]>0);
+  if(!ids.length){
+    wrap.innerHTML='<div class="empty">Nothing added yet. Click the parts above.</div>';
+    rails.innerHTML='<div class="empty">Add some loads and your rails appear here.</div>'; return;
+  }
+  let h='<div class="added">';
+  ids.forEach(id=>{const l=LOADS.find(x=>x.id===id);
+    h+='<div class="arow"><span><span class="an">'+l.n+'</span><br><span class="aq">'+l.v+' V · '+l.a+' mA avg · '+l.p+' mA peak · '+l.k+'</span></span><span class="aq">× '+cart[id]+'</span><button data-rm="'+id+'" aria-label="Remove one">−</button></div>';});
+  wrap.innerHTML=h+'</div>';
+  wrap.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{cart[b.dataset.rm]--;renderCart();}));
+
+  const g={};
+  ids.forEach(id=>{const l=LOADS.find(x=>x.id===id), q=cart[id], key=l.v.toFixed(1);
+    g[key]=g[key]||{v:l.v,avg:0,motorPeak:0,otherAvg:0,maxDelta:0,t:0,quiet:0,hasMotor:0};
+    const G=g[key]; G.avg+=l.a*q;
+    if(l.k==='motor'){ G.motorPeak+=l.p*q; G.hasMotor=1; if(l.p-l.a>G.maxDelta&&!G.t) G.t=l.t; }
+    else { G.otherAvg+=l.a*q; const d=l.p-l.a; if(d>G.maxDelta){G.maxDelta=d;G.t=l.t;} }
+    if(l.q) G.quiet=1;
+  });
+  let rh='';
+  Object.values(g).sort((a,b)=>b.v-a.v).forEach(G=>{
+    /* motors peak together; one non-motor peaks at a time */
+    const peak = G.motorPeak + G.otherAvg + G.maxDelta;
+    rh+='<div class="rail"><div><div class="rv">'+G.v+' V rail</div><div class="rd">'+
+      Math.round(G.avg)+' mA avg · '+Math.round(peak)+' mA peak'+
+      (G.hasMotor?' · motors summed':'')+(G.t?' · burst '+(G.t>=1000?(G.t/1000)+' ms':G.t+' µs'):'')+
+      (G.quiet?' · quiet':'')+'</div></div><button class="btn sm" data-rail=\''+
+      JSON.stringify({v:G.v,a:Math.round(G.avg),p:Math.round(peak),t:G.t||0,q:G.quiet})+'\'>Design this</button></div>';
+  });
+  rails.innerHTML=rh;
+  rails.querySelectorAll('[data-rail]').forEach(b=>b.addEventListener('click',()=>{
+    const r=JSON.parse(b.dataset.rail);
+    $('vout').value=r.v; $('iavg').value=r.a; $('ipeak').value=r.p;
+    $('tburst').value=r.t||1000; $('noisy').checked=!!r.q;
+    setMode('spec'); calc(); clearDirty();
+  }));
+}
+$('addedWrap') && renderCart();
+
+function setMode(m){
+  $('tabSpec').classList.toggle('on',m==='spec'); $('tabLoad').classList.toggle('on',m==='load');
+  $('panelSpec').hidden=(m!=='spec'); $('panelLoad').hidden=(m!=='load');
+}
+$('tabSpec').addEventListener('click',()=>setMode('spec'));
+$('tabLoad').addEventListener('click',()=>setMode('load'));
+
+/* ---------- engine ---------- */
+function calc(){
+  const S = SOURCES[srcSel.value], srcKey = srcSel.value;
+  const vout=+$('vout').value||5, iavg=(+$('iavg').value||0)/1000;
+  const ipeak=Math.max((+$('ipeak').value||0)/1000, iavg);
+  const tb=(+$('tburst').value||0)/1e6, tamb=+$('tamb').value||35;
+  const noisy=$('noisy').checked, hsOk=$('hsOk').checked;
+  let vmin=+$('vmin').value, vmax=+$('vmax').value, H='';
+
+  if(S.mains){ $('out').innerHTML = mainsBranch(vout, iavg); return; }
+  if(!vmin||!vmax){ $('out').innerHTML='<div class="note"><p>Enter an input voltage range.</p></div>'; return; }
+  if(vmax<vmin){ const t=vmin; vmin=vmax; vmax=t; }
+
+  const headroom=vmin-vout, stepDown=vmin>vout, stepUp=vmax<vout, crosses=(vmin<=vout&&vout<=vmax);
+  const vdrop = vmax - vout;
+  const warns = [];
+
+  /* candidates */
+  const linC = PARTS.filter(p=>(p.ty==='lin'||p.ty==='ldo') && makes(p,vout) && headroom>=p.drop && vmax<=p.vin[1])
+    .map(p=>{ const th=tja(p,hsOk); const lim=Math.min(p.irated, linLimit(vdrop,th,tamb));
+      const P=vdrop*iavg, tj=tamb+P*th;
+      return {p,th,lim,P,tj,fits:lim>=iavg}; });
+  const buckC = PARTS.filter(p=>p.ty==='buck' && makes(p,vout) && vmin>=Math.max(p.vin[0],vout+p.drop) && vmax<=p.vin[1] && p.irated>=iavg)
+    .map(p=>{ const th=tja(p,hsOk), e=eff(p,S.nom,vout,iavg), P=vout*iavg*(1/e-1), tj=tamb+P*th;
+      return {p,th,e,P,tj,fits:tj<=TJ_TARGET}; });
+  const boostC = PARTS.filter(p=>p.ty==='boost' && makes(p,vout) && vmin>=p.vin[0] && vmax<=p.vin[1] && p.irated>=iavg)
+    .map(p=>{ const th=tja(p,hsOk), e=eff(p,S.nom,vout,iavg), P=vout*iavg*(1/e-1), tj=tamb+P*th;
+      return {p,th,e,P,tj,fits:tj<=TJ_TARGET}; });
+  const bbC = PARTS.filter(p=>p.ty==='bb' && makes(p,vout) && vmin>=p.vin[0] && vmax<=p.vin[1] && p.irated>=iavg)
+    .map(p=>{ const th=tja(p,hsOk), e=eff(p,S.nom,vout,iavg), P=vout*iavg*(1/e-1), tj=tamb+P*th;
+      return {p,th,e,P,tj,fits:tj<=TJ_TARGET}; });
+  const rank = a => a.slice().sort((x,y)=>(y.fits-x.fits)||(x.p.rs-y.p.rs));
+
+  /* the reference linear case, for the "why not" story */
+  const refLin = linC.length ? rank(linC)[0] : null;
+  const genericLinTj = tamb + vdrop*iavg*(hsOk?HS_TJA:65);
+
+  let pick=null, topo='', plain='', why='';
+  if(crosses && bbC.length){ pick=rank(bbC)[0].p; topo='Buck-boost converter';
+    plain='Your input voltage crosses your output voltage as the battery drains, so nothing simpler will hold up.';
+    why='From '+f(vmin)+' V to '+f(vmax)+' V, your input passes straight through '+f(vout)+' V. A buck dies at the bottom of that range; a boost dies at the top.'; }
+  else if(stepUp && boostC.length){ pick=rank(boostC)[0].p; topo='Boost converter';
+    plain='Your input is always below your output, so you have to step up.';
+    why='Input never exceeds '+f(vmax)+' V and you need '+f(vout)+' V.'; }
+  else if(stepDown){
+    const linOK = refLin && refLin.fits;
+    if(noisy && buckC.length && linC.length){ pick=rank(buckC)[0].p; topo='Buck converter, then an LDO';
+      plain='This rail has to be quiet, so use a switcher for efficiency and a linear regulator to clean up after it.';
+      why='Neither alone is right. The buck moves the power efficiently; the LDO removes the switching noise before it reaches your analog parts.'; }
+    else if(linOK && refLin.P < 1.0){ pick=refLin.p; topo=(refLin.p.ty==='ldo'?'Low-dropout regulator':'Linear regulator');
+      plain='A plain linear regulator is enough here. It barely gets warm.';
+      why='It only burns '+f(refLin.P)+' W, which the package sheds without help. A switcher would cost more, add noise, and buy you little.'; }
+    else if(buckC.length){ pick=rank(buckC)[0].p; topo='Buck converter';
+      plain='A linear regulator would cook here. Use a switching converter.';
+      why=refLin ? 'A linear would burn '+f(vdrop*iavg)+' W and reach about '+Math.round(genericLinTj)+' °C — silicon gives up around '+TJ_MAX+' °C.'
+                 : 'The gap between input and output is far too large for any linear regulator to shed as heat.'; }
+    else if(linOK){ pick=refLin.p; topo='Linear regulator, with a heatsink';
+      plain='No switching module in the list covers your input range, so a linear it is — but it needs a heatsink.';
+      why='At '+f(refLin.P)+' W it reaches '+Math.round(refLin.tj)+' °C with the heatsink assumed here.'; }
+  }
+
+  /* selected numbers */
+  let effN=null, waste=null, tjN=null, sev='neutral';
+  if(pick){
+    const c = [...linC,...buckC,...boostC,...bbC].find(x=>x.p.id===pick.id);
+    if(c){ effN = c.e || (vout/S.nom); waste = c.P; tjN = c.tj; sev = sevOf(tjN); }
+  }
+  if(tjN!==null && tjN>TJ_TARGET) warns.push('The chosen part reaches about '+Math.round(tjN)+' °C in still air. Add a heatsink, add airflow, or pick a bigger part.');
+  if(pick && pick.ty==='ldo' && pick.id==='ams') warns.push('The AMS1117 is sold as a 1 A part. At '+f(vdrop)+' V of drop and '+tamb+' °C ambient its own datasheet thermal figure limits it to about '+Math.round(linLimit(vdrop,90,tamb)*1000)+' mA. <a class="ref" href="#i-derate">Why ratings mislead</a>');
+
+  /* ===== verdict ===== */
+  const conf = !pick ? {c:'neutral',t:'No match'}
+    : warns.length ? {c:'warnx',t:'Check this carefully'}
+    : (tjN!==null && tjN < 75) ? {c:'good',t:'Confident'} : {c:'warnx',t:'Close to a limit'};
+
+  H += '<div class="verdict"><p class="v-lab"><span>Recommended</span><span class="chip '+conf.c+'"><i class="dotm"></i>'+conf.t+'</span></p>';
+  if(pick){
+    H += '<p class="v-top">'+topo+'</p><p class="v-part">'+pick.n+' — '+rup(pick.rs)+tk(pick)+'</p>'+
+         '<p class="v-plain">'+plain+'</p><p style="font-size:15px;color:var(--ink-soft)">'+why+'</p>';
+  } else {
+    H += '<p class="v-top">Nothing in the list fits</p><p class="v-plain">No part here covers '+f(vmin)+'–'+f(vmax)+' V in, '+f(vout)+' V out at '+f(iavg)+' A. Split it into two stages, or check whether your input range is really that wide.</p>';
+  }
+  H += '</div>';
+
+  /* ===== do you need one at all ===== */
+  if(S.bat && crosses){
+    H += '<div class="note good"><p class="note-t">First — do you need a regulator at all?</p>'+
+      '<p>Your '+S.l+' runs '+f(vmin)+'–'+f(vmax)+' V and your '+f(vout)+' V output sits inside that. <strong>Check what range your load actually accepts</strong> — many modules take a range, not a fixed voltage. Cellular modules want 3.4–4.2 V, almost exactly a Li-ion cell.</p>'+
+      '<p>If it accepts the range, wire the cell straight to it with protection and bulk capacitance. No conversion means no loss, no switching noise and fewer parts. <a class="ref" href="#i-cross">When input crosses output</a></p></div>';
+  }
+
+  /* ===== tiles ===== */
+  if(pick){
+    const cost = pick.rs;
+    H += '<div class="tiles">'+
+      tile('Efficiency', effN!==null ? Math.round(effN*100)+'%' : '—', effN!==null? f(vout*iavg,1)+' W out':'')+
+      tile('Wasted as heat', waste!==null ? f(waste,1)+' W' : '—', 'at '+Math.round(iavg*1000)+' mA')+
+      tile('Junction temp', tjN!==null ? Math.round(tjN)+' °C' : '—', tjN!==null ? sevWord(tjN)+', limit '+TJ_MAX+' °C' : 'not computed')+
+      tile('Regulator cost', rup(cost), pick.ok?'price verified':'typical price')+
+      '</div>';
+  }
+
+  /* ===== thermal meter ===== */
+  if(tjN!==null){
+    const pct = clamp(tjN/TJ_MAX*100, 2, 100);
+    const ambPct = clamp(tamb/TJ_MAX*100,0,100), tgtPct = TJ_TARGET/TJ_MAX*100;
+    H += '<div class="meter-wrap"><div class="meter-head">'+
+      '<span class="meter-title">How hot it gets in still air</span>'+
+      '<span class="meter-val" style="color:var(--'+(sev==='good'?'good':sev==='warnx'?'warnx':'bad')+')">'+Math.round(tjN)+' °C &middot; '+sevWord(tjN)+'</span></div>'+
+      '<div class="track"><div class="fill '+sev+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="ticks">'+
+        '<span class="tk" style="left:'+ambPct+'%">'+tamb+'° ambient</span>'+
+        '<span class="tk" style="left:'+tgtPct+'%">'+TJ_TARGET+'° target</span>'+
+        '<span class="tk" style="left:100%;transform:translateX(-100%);text-align:right">'+TJ_MAX+'° limit</span></div>'+
+      '<p class="meter-note">Junction temperature = ambient + (watts wasted × thermal resistance). '+
+      (tjN>TJ_TARGET ? '<strong>This is past the design target.</strong> Silicon survives to about '+TJ_MAX+' °C, but designing there leaves no margin for a hot day or a stalled fan.' :
+       'That leaves '+Math.round(TJ_MAX-tjN)+' °C of margin before the silicon limit.')+'</p></div>';
+  }
+
+  /* ===== warnings ===== */
+  warns.forEach(w => { H += '<div class="note warnx"><p class="note-t">Worth knowing</p><p>'+w+'</p></div>'; });
+
+  /* ===== boost input current ===== */
+  if(stepUp && pick && effN){
+    const iin=(vout*iavg)/(effN*S.nom);
+    H += '<div class="note warnx"><p class="note-t">The thing everyone gets wrong about boost converters</p>'+
+      '<p>Your load draws '+f(iavg)+' A, but your <em>source</em> must supply <strong>'+f(iin)+' A</strong> — a boost trades current for voltage. Size the cell, the wiring and the fuse for that number. <a class="ref" href="#i-boost">Boost currents</a></p></div>';
+  }
+
+  /* ===== pulsed load ===== */
+  let burstBlock='';
+  if(ipeak > iavg*1.25 && tb > 0){
+    const respond = tb < 200e-6 ? 0 : tb > 2e-3 ? 1 : (tb-200e-6)/1.8e-3;
+    const iregFull = pick ? Math.min(pick.irated, Math.max(iavg*1.5, iavg+0.3)) : iavg;
+    const ireg = iavg + (iregFull-iavg)*respond;
+    const budget=vout*0.05, esr=0.05, esrDrop=ipeak*esr, genDrop=ipeak*0.15, room=budget-esrDrop;
+    burstBlock += '<h3>Your load is pulsed</h3>'+
+      '<p>Peak '+Math.round(ipeak*1000)+' mA against '+Math.round(iavg*1000)+' mA average, lasting '+(tb*1e6>=1000?f(tb*1000)+' ms':Math.round(tb*1e6)+' µs')+'. <strong>The regulator supplies the average; the capacitor supplies the burst.</strong></p>';
+    if(respond < 1){
+      burstBlock += '<div class="note"><p class="note-t">Why the regulator barely helps</p><p>A switching regulator&rsquo;s control loop needs tens of microseconds to react. Over a burst this short it contributes about <strong>'+Math.round(respond*100)+'%</strong> of what it could steadily supply, so this calculation assumes the capacitor does almost all the work. That is the safe assumption.</p></div>';
+    }
+    burstBlock += '<div class="eq">Droop budget (5% of V<sub>out</sub>) = <b>'+Math.round(budget*1000)+' mV</b><br>'+
+      'Generic electrolytic, ESR ≈ 0.15 Ω → '+f(ipeak)+' A × 0.15 = <b>'+Math.round(genDrop*1000)+' mV</b> spent on ESR alone<br>'+
+      'Low-ESR part, 0.05 Ω → '+f(ipeak)+' A × 0.05 = <b>'+Math.round(esrDrop*1000)+' mV</b>, leaving '+Math.round(room*1000)+' mV</div>';
+    if(genDrop >= budget)
+      burstBlock += '<div class="note bad"><p class="note-t">A generic electrolytic cannot do this</p><p>At '+f(ipeak)+' A it spends <strong>'+Math.round(genDrop*1000)+' mV</strong> on its own series resistance — your whole '+Math.round(budget*1000)+' mV budget, before releasing any charge. Capacitance was never the problem. <a class="ref" href="#i-esr">About ESR</a></p></div>';
+    if(room > 0){
+      const C=(ipeak-ireg)*tb/room, uF=Math.max(0,C*1e6), spec=uF*2;
+      burstBlock += '<div class="eq">C = (I<sub>peak</sub> − I<sub>reg</sub>) × t ÷ ΔV = ('+f(ipeak)+' − '+f(ireg)+') × '+Math.round(tb*1e6)+'µs ÷ '+f(room,3)+' V = <b>'+Math.round(uF)+' µF</b> ideal<br>'+
+        '× 2 for tolerance, DC bias and ageing &nbsp;→&nbsp; specify <b>'+Math.round(spec)+' µF</b></div>'+
+        '<div class="note"><p class="note-t">Why double it</p><p>A &ldquo;10 µF&rdquo; ceramic can be 4 µF once DC bias is applied. Electrolytics are −20/+80% and lose capacitance as they age and when cold. The ideal number is a floor, not a target.</p></div>'+
+        '<p>Buy it low-ESR, and put <strong>10 µF and 100 nF ceramics right at the load pin</strong> in front of it. <a class="ref" href="#i-burst">Bursts explained</a></p>';
+    }
+    if(S.bat){
+      const sag=ipeak*S.r;
+      burstBlock += '<div class="note '+(sag>budget?'bad':'good')+'"><p class="note-t">And the cell itself</p><p>A '+S.l+' pack has roughly '+f(S.r,3)+' Ω internal resistance. At '+f(ipeak)+' A that is <strong>'+Math.round(sag*1000)+' mV lost inside the battery</strong>'+
+        (sag>budget?' — more than your entire budget. No capacitor fixes this. You need a lower-resistance cell: a high-drain 18650 or an RC LiPo.':', which fits inside your budget.')+
+        ' <a class="ref" href="#i-rint">Cell resistance</a></p></div>';
+    }
+    H += burstBlock;
+  }
+
+  /* ===== battery ===== */
+  if(S.bat && pick){
+    const e = effN || (vout/S.nom), pin=(vout*iavg)/e, hrs=+$('runtime').value||8;
+    const wh=pin*hrs/0.8, mah=wh/S.nom*1000;
+    const iqmah = (pick.iq||0)*1000*hrs;
+    H += '<h3>Battery sizing</h3>'+
+      '<div class="eq">Input power = (V<sub>out</sub> × I<sub>out</sub>) ÷ η = ('+f(vout)+' × '+f(iavg)+') ÷ '+f(e)+' = <b>'+f(pin)+' W</b><br>'+
+      'For '+f(hrs)+' h with 80% usable = <b>'+f(wh)+' Wh</b> → at '+f(S.nom)+' V, <b>'+Math.round(mah)+' mAh</b> of cell</div>';
+    if(pick.iq){
+      const frac = iqmah/mah*100;
+      H += '<div class="note '+(frac>10?'warnx':'')+'"><p class="note-t">The regulator&rsquo;s own appetite</p>'+
+        '<p>'+pick.n+' draws <strong>'+(pick.iq>=1e-3? f(pick.iq*1000,1)+' mA':Math.round(pick.iq*1e6)+' µA')+'</strong> just to stay switched on — '+
+        (iqmah>=1? Math.round(iqmah)+' mAh':'under 1 mAh')+' over '+f(hrs)+' hours, or '+f(frac,1)+'% of your pack.</p>'+
+        (frac>10 ? '<p><strong>If your project sleeps between readings, this is now your biggest load.</strong> A 5 mA quiescent current flattens a battery over a month whether or not the device does anything. An MCP1700 at 1.6 µA is roughly three thousand times better. <a class="ref" href="#i-iq">Quiescent current</a></p>' : '')+
+        '</div>';
+    }
+    if(srcKey==='pp3') H += '<div class="note bad"><p class="note-t">The 9 V block is a trap</p><p>A PP3 holds about 4 Wh and has roughly 1.7 Ω of internal resistance. Ask it for half an amp and you lose most of a volt inside the battery. <a class="ref" href="#i-rint">Cell resistance</a></p></div>';
+    if(srcKey.startsWith('li') && srcKey!=='li1s') H += '<div class="note warnx"><p class="note-t">Past 1S — balancing starts here</p><p>Cells in series drift apart. One creeping high overcharges, which is a fire; one creeping low is a dead pack. You need a BMS with balancing and a charger matched to the cell count — a TP4056 is a 1S part. <a class="ref" href="#i-series">Cells in series</a></p></div>';
+    if(srcKey==='li1s') H += '<div class="note good"><p class="note-t">Charging</p><p>1S is the easy case. A <strong>TP4056 module at ₹38</strong> does it — buy the version with DW01 and FS8205A protection. If the circuit must run <em>while</em> charging you need a power-path charger instead. <a class="ref" href="#i-charge">Charging</a></p></div>';
+  }
+
+  /* ===== show the working ===== */
+  H += '<details><summary><span>Show the working <span class="sm-note">— every number above, derived</span></span></summary><div class="dbody">'+
+    '<div class="eq">Headroom = V<sub>in(min)</sub> − V<sub>out</sub> = '+f(vmin)+' − '+f(vout)+' = <b>'+f(headroom)+' V</b><br>'+
+    'Linear loss = (V<sub>in(max)</sub> − V<sub>out</sub>) × I<sub>avg</sub> = ('+f(vmax)+' − '+f(vout)+') × '+f(iavg)+' = <b>'+f(vdrop*iavg)+' W</b><br>'+
+    'Bare TO-220 (65 °C/W) → rise <b>'+Math.round(vdrop*iavg*65)+' °C</b> → junction '+Math.round(tamb+vdrop*iavg*65)+' °C<br>'+
+    'With a clip-on heatsink ('+HS_TJA+' °C/W) → rise <b>'+Math.round(vdrop*iavg*HS_TJA)+' °C</b> → junction '+Math.round(tamb+vdrop*iavg*HS_TJA)+' °C</div>'+
+    '<p style="font-size:14.5px;color:var(--ink-soft)">Target junction '+TJ_TARGET+' °C at '+tamb+' °C ambient. That is where the one-watt rule for a bare TO-220 comes from. <a class="ref" href="#i-heat">The heat equation</a></p>'+
+    (stepDown ? '<div class="eq">Linear efficiency = V<sub>out</sub> ÷ V<sub>in(nom)</sub> = '+f(vout)+' ÷ '+f(S.nom)+' = <b>'+Math.round(vout/S.nom*100)+'%</b>'+
+      (effN && pick && pick.ty!=='lin' && pick.ty!=='ldo' ? '<br>Chosen switcher ≈ <b>'+Math.round(effN*100)+'%</b> → about '+Math.round((effN/(vout/S.nom)-1)*100)+'% more runtime on the same battery' : '')+'</div>' : '')+
+    thermalTable(linC, buckC, boostC, bbC, iavg) +
+    '</div></details>';
+
+  /* ===== why not the others ===== */
+  H += '<details><summary><span>Why not the others <span class="sm-note">— all five topologies, and what ruled each out</span></span></summary><div class="dbody"><div class="scroll"><table>'+
+    '<thead><tr><th>Topology</th><th>Verdict</th><th>The number that decided it</th></tr></thead><tbody>'+
+    row('Linear regulator', topo.startsWith('Linear'), stepDown&&refLin&&refLin.fits,
+      !stepDown ? 'Cannot step up — your input falls to '+f(vmin)+' V.'
+      : !linC.length ? 'Nothing here has low enough dropout for '+f(headroom)+' V of headroom.'
+      : refLin.fits ? 'Burns '+f(refLin.P)+' W → '+Math.round(refLin.tj)+' °C junction. Survivable.'
+      : 'Would burn '+f(vdrop*iavg)+' W → about '+Math.round(genericLinTj)+' °C. Silicon gives up near '+TJ_MAX+' °C.')+
+    row('Buck converter', topo==='Buck converter', stepDown&&buckC.length>0,
+      !stepDown ? 'Cannot step up.' : !buckC.length ? 'No module covers '+f(vmin)+'–'+f(vmax)+' V in at '+f(vout)+' V / '+f(iavg)+' A.'
+      : 'Handles the full range at about '+Math.round(rank(buckC)[0].e*100)+'% efficiency.')+
+    row('Boost converter', topo==='Boost converter', stepUp&&boostC.length>0,
+      !stepUp ? 'Only needed when input is always below output. Yours reaches '+f(vmax)+' V.'
+      : !boostC.length ? 'No module delivers '+f(vout)+' V at '+f(iavg)+' A from this input.' : 'Steps '+f(vmin)+' V up to '+f(vout)+' V.')+
+    row('Buck-boost / SEPIC', topo.startsWith('Buck-boost'), crosses&&bbC.length>0,
+      !crosses ? 'Only needed when input crosses output during discharge. Yours does not.'
+      : !bbC.length ? 'Needed here, but no listed part covers it.' : 'Your input crosses '+f(vout)+' V, so this is the honest answer.')+
+    row('Buck then LDO', topo.includes('then an LDO'), stepDown&&buckC.length>0&&noisy,
+      !noisy ? 'Only worth the extra part when the rail must be quiet.' : !buckC.length ? 'Needs a working buck stage first.'
+      : 'Switcher efficiency with a linear&rsquo;s quiet output.')+
+    '</tbody></table></div></div></details>';
+
+  /* ===== shopping list ===== */
+  if(pick){
+    let total=0, rowsH='';
+    const add=(n,r,rs,ok)=>{total+=rs; rowsH+='<tr><td class="pn">'+n+'</td><td>'+r+'</td><td class="num">'+rup(rs)+(ok?' <span class="tick">✓</span>':'')+'</td></tr>';};
+    add(pick.n,'The regulator',pick.rs,pick.ok);
+    if(topo.includes('then an LDO')) add('MCP1700 or similar LDO','Cleans up switching noise',35,0);
+    if(ipeak>iavg*1.25 && tb>0) add('Low-ESR electrolytic + 10 µF + 100 nF','Supplies the burst',22,0);
+    if(tjN!==null && tjN>TJ_TARGET) add('Clip-on heatsink','Brings the junction back under the target',18,0);
+    add('P-MOSFET, reverse polarity','Protection without losing 0.7 V',12,0);
+    add('Polyfuse (PTC)','Resettable overcurrent protection',8,0);
+    if(S.bat && srcKey==='li1s') add('TP4056 module','Charging (1S only)',38,1);
+    H += '<h3>Shopping list</h3><div class="scroll"><table><thead><tr><th>Part</th><th>What it does</th><th class="num">Price</th></tr></thead><tbody>'+rowsH+
+      '<tr class="tot"><td colspan="2">Total</td><td class="num">'+rup(total)+'</td></tr></tbody></table></div>'+
+      '<p style="font-size:14.5px;color:var(--ink-soft)">Perfboard, wire and connectors on top. Keep the high-current loop short and use 20 AWG. <a class="ref" href="#i-wiring">Wiring it</a></p>';
+  }
+
+  /* ===== honesty ===== */
+  H += '<details><summary><span>What this assumed <span class="sm-note">— the numbers behind the numbers</span></span></summary><div class="dbody"><p class="assume">'+
+    'Ambient temperature <b>'+tamb+' °C</b>, still air, no airflow.<br>'+
+    'Target junction temperature <b>'+TJ_TARGET+' °C</b>; silicon limit <b>'+TJ_MAX+' °C</b>.<br>'+
+    'Thermal resistance: bare TO-220 <b>65 °C/W</b> · AMS1117 SOT-223 <b>90 °C/W</b> (its datasheet) · clip-on heatsink <b>'+HS_TJA+' °C/W</b>.<br>'+
+    'Switcher efficiency from η ≈ V<sub>out</sub> ÷ (V<sub>out</sub> + k), fitted to the TI LM2596 datasheet (73% at 3.3 V, 80% at 5 V, 90% at 12 V, all at 3 A), with penalties below 20% load and for step-down ratios under 0.35.<br>'+
+    'Burst capacitance assumes the regulator contributes nothing below 200 µs, then ramps to full by 2 ms; result doubled for tolerance, DC bias and ageing.<br>'+
+    'Capacitor ESR taken as <b>0.15 Ω</b> generic, <b>0.05 Ω</b> low-ESR.<br>'+
+    'Battery internal resistance is a mid-charge typical value at room temperature — it rises as the cell drains and in cold weather.<br>'+
+    'Load-library currents are typical figures, not per-unit measurements.</p></div></details>';
+
+  H += '<div class="note"><p class="note-t">What this does not check</p><ul>'+
+    '<li><strong>Output ripple and noise</strong> — no ripple figure is computed anywhere here.</li>'+
+    '<li><strong>Inrush at switch-on</strong> — the first few milliseconds can trip a supply that is fine afterwards.</li>'+
+    '<li><strong>EMI</strong> — a switcher on perfboard radiates, and this says nothing about it.</li>'+
+    '<li><strong>Your actual layout</strong> — loop area, wire gauge and grounding decide whether it works. <a class="ref" href="#i-wiring">Wiring it</a></li>'+
+    '<li><strong>Your real thermal environment</strong> — inside a sealed box, every temperature here is optimistic.</li>'+
+    '<li><strong>Stability</strong> — an LDO with the wrong output capacitor oscillates, and this cannot see that. <a class="ref" href="#i-stability">LDO stability</a></li>'+
+    '</ul><p style="margin-top:9px">Build it, then <strong>put a scope on it</strong>. A multimeter will tell you it is fine when it is not. <a class="ref" href="#i-measure">How to measure it</a></p></div>';
+
+  $('out').innerHTML = H;
+}
+
+function tile(l,v,n){ return '<div class="tile"><p class="tl">'+l+'</p><p class="tv">'+v+'</p>'+(n?'<p class="tn">'+n+'</p>':'')+'</div>'; }
+function row(k,isPick,works,why){
+  const cls = isPick?'good':works?'neutral':'bad', txt = isPick?'Chosen':works?'Would work':'No';
+  return '<tr><td><strong>'+k+'</strong></td><td><span class="chip '+cls+'"><i class="dotm"></i>'+txt+'</span></td><td>'+why+'</td></tr>';
+}
+function thermalTable(lin,buck,boost,bb,iavg){
+  const all=[...lin,...buck,...boost,...bb];
+  if(!all.length) return '';
+  let h='<h3 style="margin-top:22px">Every candidate, checked thermally</h3><div class="scroll"><table><thead><tr><th>Part</th><th class="num">θ<sub>JA</sub></th><th class="num">Waste</th><th class="num">Junction</th><th>State</th></tr></thead><tbody>';
+  all.slice().sort((a,b)=>a.tj-b.tj).forEach(c=>{
+    h+='<tr><td class="pn">'+c.p.n+'</td><td class="num">'+c.th+' °C/W</td><td class="num">'+f(c.P,2)+' W</td><td class="num">'+Math.round(c.tj)+' °C</td>'+
+       '<td><span class="chip '+sevOf(c.tj)+'"><i class="dotm"></i>'+sevWord(c.tj)+'</span></td></tr>';
+  });
+  return h+'</tbody></table></div><p style="font-size:14.5px;color:var(--ink-soft)">Sorted coolest first. A part that is thermally fine but expensive may still be the right buy.</p>';
+}
+function mainsBranch(vout, iavg){
+  const c = PARTS.filter(p=>p.ty==='acdc' && makes(p,vout) && p.irated>=iavg).sort((a,b)=>a.rs-b.rs)[0];
+  let H = '<div class="verdict"><p class="v-lab"><span>Recommended</span><span class="chip good"><i class="dotm"></i>Safety first</span></p>';
+  H += c ? '<p class="v-top">A ready-made isolated AC-DC module</p><p class="v-part">'+c.n+' — '+rup(c.rs)+tk(c)+'</p><p class="v-plain">'+c.note+'. It gives '+f(outR(c)[0])+' V at up to '+f(c.irated)+' A behind a proper isolation barrier, and you never touch a live circuit.</p>'
+    : '<p class="v-top">Use a certified adapter, then a DC-DC stage</p><p class="v-plain">No potted module here makes '+f(vout)+' V at '+f(iavg)+' A. Buy a BIS-certified adapter and step it down — also the safest path.</p>';
+  H += '</div>';
+  H += '<div class="note bad"><p class="note-t">Read this before you build anything on mains</p>'+
+    '<p><strong>Never build a non-isolated mains circuit on perfboard.</strong> 230 V will kill you, and perfboard has neither the creepage distance nor the mechanical protection to be safe. Use a potted certified module or a sealed adapter — both cheap, both already tested.</p>'+
+    '<p>The transformer-bridge-capacitor-7805 circuit in old textbooks is history, not a recommendation. <a class="ref" href="#i-mains">Mains safety</a></p></div>';
+  H += '<h3>The four ways to get DC from mains</h3><div class="scroll"><table><thead><tr><th>Approach</th><th>When</th><th class="num">From</th></tr></thead><tbody>'+
+   '<tr><td><strong>Certified adapter</strong></td><td>Almost always. Tested, sealed, someone else carries the liability.</td><td class="num">₹183 <span class="tick">✓</span></td></tr>'+
+   '<tr><td><strong>Potted isolated module</strong></td><td>When it must live inside your enclosure. Hi-Link HLK series.</td><td class="num">₹215 <span class="tick">✓</span></td></tr>'+
+   '<tr><td><strong>Offline switcher IC</strong></td><td>When you want to build and understand it. TNY285PG.</td><td class="num">₹63 <span class="tick">✓</span></td></tr>'+
+   '<tr><td><strong>Transformer + bridge + 7805</strong></td><td>To learn rectification and ripple. Bulky, hot, obsolete in practice.</td><td class="num">—</td></tr>'+
+   '</tbody></table></div>';
+  return H;
+}
+
+/* ---------- share ---------- */
+function encode(){
+  return location.origin+location.pathname+'#'+new URLSearchParams({s:srcSel.value,vo:$('vout').value,
+    ia:$('iavg').value,ip:$('ipeak').value,tb:$('tburst').value,ta:$('tamb').value,
+    n:$('noisy').checked?1:0,h:$('hsOk').checked?1:0,vn:$('vmin').value,vx:$('vmax').value}).toString();
+}
+(function decode(){
+  if(!location.hash) return;
+  const p=new URLSearchParams(location.hash.slice(1)); if(!p.get('vo')) return;
+  if(p.get('s')&&SOURCES[p.get('s')]){ srcSel.value=p.get('s'); applySource(); }
+  const st=(id,k)=>{ if(p.get(k)!==null) $(id).value=p.get(k); };
+  st('vout','vo');st('iavg','ia');st('ipeak','ip');st('tburst','tb');st('tamb','ta');st('vmin','vn');st('vmax','vx');
+  $('noisy').checked=p.get('n')==='1'; $('hsOk').checked=p.get('h')==='1';
+})();
+$('shareBtn').addEventListener('click',async()=>{
+  const u=encode();
+  try{ await navigator.clipboard.writeText(u); $('shareBtn').textContent='Copied'; }
+  catch(e){ location.hash=u.split('#')[1]; $('shareBtn').textContent='In the address bar'; }
+  setTimeout(()=>{$('shareBtn').textContent='Copy link';},2200);
+});
+
+$('calcBtn').addEventListener('click',()=>{calc();clearDirty();});
+
+/* nothing recalculates on its own — the button is the only trigger.
+   Enter inside any field runs it, so you never have to reach for the mouse. */
+const FIELDS=['vout','iavg','ipeak','tburst','tamb','vmin','vmax','runtime','noisy','hsOk'];
+FIELDS.forEach(id=>{
+  const el=$(id); if(!el) return;
+  el.addEventListener('input', markDirty);
+  el.addEventListener('change', markDirty);
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); calc(); clearDirty(); } });
+});
+calc();
+</script>
+
+</body>
+</html>
