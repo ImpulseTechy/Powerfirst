@@ -242,6 +242,28 @@ tr.tot td{border-top:1.5px solid var(--rule); font-weight:600; background:var(--
 .ref:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
 .assume{font-family:"IBM Plex Mono",monospace; font-size:12.5px; line-height:1.85; color:var(--ink-soft)}
 .assume b{color:var(--ink); font-weight:600}
+
+/* ===== FIELD EXPLANATIONS ===== */
+.label-row{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:0 0 5px}
+.label-row label{margin:0}
+.help-btn{display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; border-radius:50%; border:1px solid var(--rule);
+  background:none; color:var(--ink-faint); font-family:"IBM Plex Mono",monospace;
+  font-size:10px; font-weight:600; line-height:1; cursor:pointer; flex:none;
+  padding:0; transition:color .15s, border-color .15s}
+.help-btn:hover,.help-btn[aria-expanded="true"]{color:var(--copper); border-color:var(--copper)}
+.help-btn:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+.field-explain{background:var(--surface-2); border-left:2px solid var(--copper);
+  padding:10px 12px; margin-top:6px; border-radius:2px}
+.field-explain p{font-family:"Source Serif 4",Georgia,serif; font-size:14px;
+  line-height:1.55; margin:0 0 8px; color:var(--ink-soft)}
+.field-explain p:last-child{margin-bottom:0}
+.field-explain code{font-family:"IBM Plex Mono",monospace; font-size:.88em;
+  background:var(--surface); padding:1px 4px; border-radius:2px}
+.explain-all-btn{font-family:"Archivo",sans-serif; font-size:12.5px; font-weight:600;
+  color:var(--copper); background:none; border:none; padding:0; cursor:pointer;
+  text-decoration:underline; text-underline-offset:2px; margin:0 0 18px; display:block}
+.explain-all-btn:focus-visible{outline:2px solid var(--copper); outline-offset:3px}
 /* ideas section */
 #ideas{margin-top:64px; padding-top:34px; border-top:2px solid var(--ink); scroll-margin-top:20px}
 .ideas-h{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(1.5rem,3.4vw,2.1rem);
@@ -323,19 +345,91 @@ tr.tot td{border-top:1.5px solid var(--rule); font-weight:600; background:var(--
     <div class="panel" id="panelSpec">
       <h2>Your specification</h2>
       <p class="hint">Change anything and the answer updates.</p>
+      <button class="explain-all-btn" id="explainAllBtn" type="button">Explain every field</button>
       <div class="field"><label for="src">Where the power comes from</label><select id="src"></select></div>
       <div class="pair">
-        <div class="field"><label for="vmin">V<sub>in</sub> minimum <span class="unit">V</span></label><input type="number" id="vmin" step="0.1"></div>
-        <div class="field"><label for="vmax">V<sub>in</sub> maximum <span class="unit">V</span></label><input type="number" id="vmax" step="0.1"></div>
+        <div class="field">
+          <div class="label-row">
+            <label for="vmin">V<sub>in</sub> minimum <span class="unit">V</span></label>
+            <button class="help-btn" type="button" id="help-vmin-btn" aria-label="What is Vin minimum?" aria-expanded="false" aria-controls="help-vmin">?</button>
+          </div>
+          <div class="field-explain" id="help-vmin" role="note" hidden>
+            <p>The <strong>lowest</strong> voltage your source will ever give — not the number printed on the label. This is what decides whether a regulator can work at all, because if the input falls too far the output simply follows it down.</p>
+            <p>A <code>12 V</code> adapter can sit at <code>11.4 V</code>. A 1S Li-ion sold as <code>3.7 V</code> falls to <code>3.0 V</code> when nearly empty. A <code>12 V</code> lead-acid battery reaches about <code>10.5 V</code>. Always use the worst case — that is the moment your circuit fails.</p>
+          </div>
+          <input type="number" id="vmin" step="0.1">
+        </div>
+        <div class="field">
+          <div class="label-row">
+            <label for="vmax">V<sub>in</sub> maximum <span class="unit">V</span></label>
+            <button class="help-btn" type="button" id="help-vmax-btn" aria-label="What is Vin maximum?" aria-expanded="false" aria-controls="help-vmax">?</button>
+          </div>
+          <div class="field-explain" id="help-vmax" role="note" hidden>
+            <p>The <strong>highest</strong> voltage your source will ever reach. It decides two things: whether your parts survive it, and how much heat a linear regulator makes — because the waste is <code>(Vin &minus; Vout) &times; I</code>, and that is worst at the top of the range.</p>
+            <p>A <code>12 V</code> adapter can reach <code>12.6 V</code> with nothing connected. A fully charged 1S Li-ion is <code>4.2 V</code>, not <code>3.7 V</code>. A car&rsquo;s electrical system hits <code>14.4 V</code> with the engine running.</p>
+          </div>
+          <input type="number" id="vmax" step="0.1">
+        </div>
       </div>
-      <div class="field"><label for="vout">Output voltage <span class="unit">V</span></label><input type="number" id="vout" step="0.1" value="5"></div>
-      <div class="pair">
-        <div class="field"><label for="iavg">Average current <span class="unit">mA</span></label><input type="number" id="iavg" step="10" value="1000"></div>
-        <div class="field"><label for="ipeak">Peak current <span class="unit">mA</span></label><input type="number" id="ipeak" step="10" value="1200"></div>
+      <div class="field">
+        <div class="label-row">
+          <label for="vout">Output voltage <span class="unit">V</span></label>
+          <button class="help-btn" type="button" id="help-vout-btn" aria-label="What is output voltage?" aria-expanded="false" aria-controls="help-vout">?</button>
+        </div>
+        <div class="field-explain" id="help-vout" role="note" hidden>
+          <p>The voltage your load needs. Most digital parts want <code>3.3 V</code> or <code>5 V</code>, within a few percent.</p>
+          <p>But check whether your load truly needs a <em>fixed</em> voltage or accepts a <strong>range</strong> — many modules accept a range, and if that range covers your battery&rsquo;s range you may not need a regulator at all. A cellular module wanting <code>3.4&ndash;4.2 V</code> is almost exactly a Li-ion cell.</p>
+        </div>
+        <input type="number" id="vout" step="0.1" value="5">
       </div>
       <div class="pair">
-        <div class="field"><label for="tburst">Peak lasts <span class="unit">µs</span></label><input type="number" id="tburst" step="10" value="1000"></div>
-        <div class="field"><label for="tamb">Ambient temp <span class="unit">°C</span></label><input type="number" id="tamb" step="1" value="35"></div>
+        <div class="field">
+          <div class="label-row">
+            <label for="iavg">Average current <span class="unit">mA</span></label>
+            <button class="help-btn" type="button" id="help-iavg-btn" aria-label="What is average current?" aria-expanded="false" aria-controls="help-iavg">?</button>
+          </div>
+          <div class="field-explain" id="help-iavg" role="note" hidden>
+            <p>What your circuit draws <strong>most of the time</strong>, measured over seconds rather than microseconds. This sets how much heat is produced and how long a battery lasts.</p>
+            <p>It is <em>not</em> the sum of every datasheet maximum — real parts spend most of their life idle. An ESP32 averages around <code>80 mA</code> even though it peaks far higher. Measure it with a USB power meter if you can; otherwise use the datasheet&rsquo;s <em>typical</em> figures, not the maximums.</p>
+          </div>
+          <input type="number" id="iavg" step="10" value="1000">
+        </div>
+        <div class="field">
+          <div class="label-row">
+            <label for="ipeak">Peak current <span class="unit">mA</span></label>
+            <button class="help-btn" type="button" id="help-ipeak-btn" aria-label="What is peak current?" aria-expanded="false" aria-controls="help-ipeak">?</button>
+          </div>
+          <div class="field-explain" id="help-ipeak" role="note" hidden>
+            <p>The <strong>highest</strong> current your circuit draws, even for an instant. This decides whether your rail sags far enough to reset something, and how much capacitance you need.</p>
+            <p>Peaks are usually several times the average. A WiFi radio jumps to about <code>500 mA</code> when it transmits. A servo pulls <code>2.5 A</code> if it stalls. A 2G module takes <code>2 A</code> mid-burst. <strong>Getting this number wrong is the most common reason a circuit works on the bench and fails in use.</strong></p>
+          </div>
+          <input type="number" id="ipeak" step="10" value="1200">
+        </div>
+      </div>
+      <div class="pair">
+        <div class="field">
+          <div class="label-row">
+            <label for="tburst">Peak lasts <span class="unit">µs</span></label>
+            <button class="help-btn" type="button" id="help-tburst-btn" aria-label="What is peak duration?" aria-expanded="false" aria-controls="help-tburst">?</button>
+          </div>
+          <div class="field-explain" id="help-tburst" role="note" hidden>
+            <p>How long a single peak lasts, in microseconds. <code>1000 µs</code> = <code>1 ms</code>.</p>
+            <p>This matters because a regulator&rsquo;s control loop needs tens of microseconds to react. A short spike is supplied almost entirely by a <strong>capacitor</strong>, not by the regulator — so duration changes the answer completely.</p>
+            <p>A GSM transmit burst is <code>577 µs</code>. A WiFi burst runs a few milliseconds (<code>~5000 µs</code>). A servo moving takes hundreds of milliseconds. Short and violent needs capacitance; long and heavy needs a bigger supply.</p>
+          </div>
+          <input type="number" id="tburst" step="10" value="1000">
+        </div>
+        <div class="field">
+          <div class="label-row">
+            <label for="tamb">Ambient temp <span class="unit">°C</span></label>
+            <button class="help-btn" type="button" id="help-tamb-btn" aria-label="What is ambient temperature?" aria-expanded="false" aria-controls="help-tamb">?</button>
+          </div>
+          <div class="field-explain" id="help-tamb" role="note" hidden>
+            <p>The air temperature <strong>around the part</strong> — not room temperature in the abstract. Every heat calculation starts here: junction temperature is ambient plus the rise the part creates, and silicon gives up near <code>125 °C</code>.</p>
+            <p>Use <code>35 °C</code> for a typical Indian room. If the board lives inside a sealed enclosure where air cannot move, <code>50&ndash;60 °C</code> is realistic — and every other number on this page shifts with it.</p>
+          </div>
+          <input type="number" id="tamb" step="1" value="35">
+        </div>
       </div>
       <label style="margin-bottom:9px">Options</label>
       <label class="chk"><input type="checkbox" id="noisy"><span>This rail feeds analog, ADC or RF &mdash; it must be quiet</span></label>
@@ -958,6 +1052,57 @@ FIELDS.forEach(id=>{
   el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); calc(); clearDirty(); } });
 });
 calc();
+
+/* ===== FIELD EXPLANATIONS ===== */
+const HELP_IDS = ['vmin','vmax','vout','iavg','ipeak','tburst','tamb'];
+
+function setExplain(id, open){
+  const panel = $('help-'+id);
+  const btn   = $('help-'+id+'-btn');
+  if(!panel || !btn) return;
+  panel.hidden = !open;
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function allExplainOpen(){
+  return HELP_IDS.every(id => !$('help-'+id).hidden);
+}
+
+function syncExplainAllBtn(){
+  const open = allExplainOpen();
+  $('explainAllBtn').textContent = open ? 'Hide explanations' : 'Explain every field';
+}
+
+/* individual ? buttons */
+HELP_IDS.forEach(id => {
+  const btn = $('help-'+id+'-btn');
+  if(!btn) return;
+  btn.addEventListener('click', () => {
+    const nowOpen = $('help-'+id).hidden;
+    setExplain(id, nowOpen);
+    syncExplainAllBtn();
+    /* do not trigger calc() */
+  });
+});
+
+/* explain-all toggle */
+$('explainAllBtn').addEventListener('click', () => {
+  const open = !allExplainOpen();
+  HELP_IDS.forEach(id => setExplain(id, open));
+  syncExplainAllBtn();
+  /* persist */
+  try { localStorage.setItem('psp-explain', open ? '1' : '0'); } catch(e) {}
+});
+
+/* restore from localStorage */
+(function restoreExplain(){
+  let stored;
+  try { stored = localStorage.getItem('psp-explain'); } catch(e) { stored = null; }
+  if(stored === '1'){
+    HELP_IDS.forEach(id => setExplain(id, true));
+    syncExplainAllBtn();
+  }
+})();
 </script>
 
 </body>
