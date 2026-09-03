@@ -80,6 +80,25 @@ h1{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(2.1rem,5vw
   color:var(--copper); text-decoration:none; border-bottom:1px solid var(--copper)}
 .booklink:focus-visible{outline:2px solid var(--copper); outline-offset:3px}
 
+.sitenav{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 0}
+.sitenav a{font-family:"Archivo",sans-serif; font-size:13px; font-weight:600;
+  color:var(--ink-soft); text-decoration:none; border:1px solid var(--rule);
+  padding:5px 13px; border-radius:2px; background:var(--surface); white-space:nowrap}
+.sitenav a:hover{border-color:var(--copper); color:var(--copper)}
+.sitenav a.here{border-color:var(--copper); color:var(--copper); background:var(--copper-wash)}
+.sitenav a:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+
+.header-top{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap}
+.theme-row{display:flex; align-items:center; gap:6px; flex-shrink:0}
+.theme-lbl{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint)}
+.theme-btn{font-family:"Archivo",sans-serif; font-weight:600; font-size:12.5px;
+  padding:5px 12px; border-radius:2px; cursor:pointer;
+  border:1px solid var(--rule); background:var(--surface); color:var(--ink-soft)}
+.theme-btn.on{border-color:var(--copper); color:var(--copper); background:var(--copper-wash)}
+.theme-btn:hover:not(.on){border-color:var(--copper); color:var(--copper)}
+.theme-btn:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+
 .tabs{display:flex; border:1px solid var(--rule); border-radius:2px; overflow:hidden;
   margin:0 0 24px; width:fit-content; max-width:100%; flex-wrap:wrap}
 .tab{font-family:"Archivo",sans-serif; font-weight:600; font-size:14px; padding:10px 20px;
@@ -319,10 +338,25 @@ tr.tot td{border-top:1.5px solid var(--rule); font-weight:600; background:var(--
 
 <div class="wrap">
 <header>
-  <p class="kick">Free tool &middot; for students and makers</p>
-  <h1>Power Supply Picker</h1>
+  <div class="header-top">
+    <div>
+      <p class="kick">Free tool &middot; for students and makers</p>
+      <h1>Power Supply Picker</h1>
+    </div>
+    <div class="theme-row" aria-label="Colour theme">
+      <span class="theme-lbl">Theme</span>
+      <button class="theme-btn" id="themeAuto" type="button" aria-pressed="true">Auto</button>
+      <button class="theme-btn" id="themeLight" type="button" aria-pressed="false">Light</button>
+      <button class="theme-btn" id="themeDark" type="button" aria-pressed="false">Dark</button>
+    </div>
+  </div>
   <p class="sub">Tell it what your project needs. It gives you a plain answer first, then shows every calculation behind it, what it assumed, and what it did not check.</p>
   <a class="booklink" href="#ideas">The ideas behind the answers &darr;</a>
+  <nav class="sitenav" aria-label="Site">
+    <a href="/" class="here" aria-current="page">Power Supply Picker</a>
+    <a href="/book/">The Book</a>
+    <a href="/modules/">Module Directory</a>
+  </nav>
 </header>
 
 <div class="tabs" role="tablist">
@@ -1102,6 +1136,33 @@ $('explainAllBtn').addEventListener('click', () => {
     HELP_IDS.forEach(id => setExplain(id, true));
     syncExplainAllBtn();
   }
+})();
+
+/* ===== THEME TOGGLE — shared key psp-theme ===== */
+(function(){
+  const root=document.documentElement,THEMES=['auto','light','dark'];
+  const btnIds={auto:'themeAuto',light:'themeLight',dark:'themeDark'};
+  let current='auto';
+  try{current=localStorage.getItem('psp-theme')||'auto';}catch(e){}
+  if(THEMES.indexOf(current)<0)current='auto';
+  function applyTheme(t){
+    current=t;
+    if(t==='dark')root.setAttribute('data-theme','dark');
+    else if(t==='light')root.setAttribute('data-theme','light');
+    else root.removeAttribute('data-theme');
+    THEMES.forEach(k=>{
+      const btn=document.getElementById(btnIds[k]);
+      if(!btn)return;
+      btn.classList.toggle('on',k===t);
+      btn.setAttribute('aria-pressed',k===t?'true':'false');
+    });
+    try{localStorage.setItem('psp-theme',t);}catch(e){}
+  }
+  applyTheme(current);
+  THEMES.forEach(t=>{
+    const btn=document.getElementById(btnIds[t]);
+    if(btn)btn.addEventListener('click',()=>applyTheme(t));
+  });
 })();
 </script>
 

@@ -304,6 +304,23 @@ td.num,th.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabula
 .foot{margin-top:26px; padding-top:22px; border-top:1px solid var(--rule);
   font-size:13.5px; color:var(--ink-faint); font-family:"IBM Plex Mono",monospace; line-height:1.65}
 
+.sitenav{display:flex; flex-wrap:wrap; gap:8px; margin:0 10px 0 0}
+.sitenav a{font-family:"Archivo",sans-serif; font-size:13px; font-weight:600;
+  color:var(--ink-soft); text-decoration:none; border:1px solid var(--rule);
+  padding:5px 13px; border-radius:2px; background:var(--surface); white-space:nowrap}
+.sitenav a:hover{border-color:var(--copper); color:var(--copper)}
+.sitenav a.here{border-color:var(--copper); color:var(--copper); background:var(--copper-wash)}
+.sitenav a:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+.theme-row{display:flex; align-items:center; gap:6px}
+.theme-lbl{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint)}
+.theme-btn{font-family:"Archivo",sans-serif; font-weight:600; font-size:12.5px;
+  padding:5px 12px; border-radius:2px; cursor:pointer;
+  border:1px solid var(--rule); background:var(--surface); color:var(--ink-soft)}
+.theme-btn.on{border-color:var(--copper); color:var(--copper); background:var(--copper-wash)}
+.theme-btn:hover:not(.on){border-color:var(--copper); color:var(--copper)}
+.theme-btn:focus-visible{outline:2px solid var(--copper); outline-offset:2px}
+
 @media (max-width:900px){
   .shell{grid-template-columns:1fr}
   .side{position:fixed; top:49px; left:0; width:min(320px,86vw); z-index:35;
@@ -320,8 +337,19 @@ td.num,th.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabula
 
 
 <header class="top">
-  <button class="menu-btn" id="menuBtn" aria-label="Toggle contents">☰ Contents</button>
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle contents">&#9776; Contents</button>
   <button class="brand" id="brandBtn">Power First <span>Online edition</span></button>
+  <nav class="sitenav" aria-label="Site">
+    <a href="/">Power Supply Picker</a>
+    <a href="/book/" class="here" aria-current="page">The Book</a>
+    <a href="/modules/">Module Directory</a>
+  </nav>
+  <div class="theme-row" aria-label="Colour theme">
+    <span class="theme-lbl">Theme</span>
+    <button class="theme-btn" id="themeAuto" type="button" aria-pressed="true">Auto</button>
+    <button class="theme-btn" id="themeLight" type="button" aria-pressed="false">Light</button>
+    <button class="theme-btn" id="themeDark" type="button" aria-pressed="false">Dark</button>
+  </div>
   <span class="prog" id="prog">2 of 29 chapters published</span>
 </header>
 
@@ -875,6 +903,33 @@ function fromHash(){
 }
 window.addEventListener('hashchange', fromHash);
 fromHash();
+
+/* ===== THEME TOGGLE — shared key psp-theme ===== */
+(function(){
+  var root=document.documentElement,THEMES=['auto','light','dark'];
+  var btnIds={auto:'themeAuto',light:'themeLight',dark:'themeDark'};
+  var current='auto';
+  try{current=localStorage.getItem('psp-theme')||'auto';}catch(e){}
+  if(THEMES.indexOf(current)<0)current='auto';
+  function applyTheme(t){
+    current=t;
+    if(t==='dark')root.setAttribute('data-theme','dark');
+    else if(t==='light')root.setAttribute('data-theme','light');
+    else root.removeAttribute('data-theme');
+    THEMES.forEach(function(k){
+      var btn=document.getElementById(btnIds[k]);
+      if(!btn)return;
+      btn.classList.toggle('on',k===t);
+      btn.setAttribute('aria-pressed',k===t?'true':'false');
+    });
+    try{localStorage.setItem('psp-theme',t);}catch(e){}
+  }
+  applyTheme(current);
+  THEMES.forEach(function(t){
+    var btn=document.getElementById(btnIds[t]);
+    if(btn)btn.addEventListener('click',function(){applyTheme(t);});
+  });
+})();
 </script>
 
 </body>
